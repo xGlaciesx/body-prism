@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 人体棱镜 Body Prism
 
-## Getting Started
+同一具身体，三种读法：结构之镜、关系之镜、信息之镜。
 
-First, run the development server:
+## 本地启动
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+先运行 `npm install`，再运行 `npm run dev`，打开 http://localhost:3000。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 常用命令
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `npm run lint`
+- `npm run build`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 目录
 
-## Learn More
+- `src/app`：页面
+- `src/components`：组件
+- `src/content/organs`：器官内容
+- `docs/team-handbook`：团队手册
+- `docs/SESSION_LOG.md`：每日进展
+- `docs/DECISIONS.md`：已定决策
 
-To learn more about Next.js, take a look at the following resources:
+## 内容边界
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+本项目用于健康科普与竞赛展示，不提供诊断、处方或剂量建议。
+中医内容标注“传统理论”，信息论内容标注“概念类比”。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 素材许可
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+见 `ATTRIBUTION.md`。
