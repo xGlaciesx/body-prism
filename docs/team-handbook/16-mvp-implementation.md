@@ -6,9 +6,10 @@
 > 原则：**纵向切片**——每次做一个能独立演示的完整小功能，而不是“先把所有页面建空壳”。
 
 > **前置与分工（这份文档不重复环境配置）**
-> - 环境安装、Git 身份、建仓库、加协作者、保护 main、配 CI、**第一个 PR** → 全在 **00 起步手册**，这里**不再重做**；
-> - 把项目跑起来、把团队手册放进仓库、第一次功能改动 → **14 第一天写代码**；
-> - 每天开工/收工、分支与合并 → **15 每天的 Git 节奏**；
+> - **这是参考手册，不是第二条主线。** 操作请照 [00 主线手册](00-start-here.html)；本篇只负责“写什么代码”。
+> - 环境安装、建库、加合作者、保护 main、**第一个 PR**、每日节奏 → 全在 **00**，这里**不再重做**；
+> - 第一天的详细展开 → [14 第一天写代码](14-first-code-day.html)；
+> - 每天开工/收工、分支与合并 → [15 每天的 Git 节奏](15-daily-git-rhythm.html)；
 > - 这份文档只回答“**先写哪个文件、每个文件放什么、做到什么算完成**”。看到 `git commit` 示例，照抄提交信息即可，不要重新 `create-next-app`、也不要重新 `git init`。
 
 ---
@@ -443,6 +444,8 @@ export const organBySlug = new Map(organs.map((o) => [o.slug, o]));
 
 **不要一次把六个器官都写进 import**：文件还不存在时会直接报 `Module not found`。一次只加一个器官，加一个就提交一次。
 
+> **更快的做法：直接用现成内容包。** 文档包里的 `content-pack/organs/` 已经写好六个器官（heart / brain / lung / liver / kidney / stomach），字段与上面的 schema 完全一致，直接复制进 `src/content/organs/` 即可；`content-pack/curator-fallback.ts` 是 AI 兜底答案。**医学表述仍需男孩按 `content-pack/REVIEW.md` 逐条审核**，不审核不能上线。
+
 ### 3.4 `src/lib/content.ts`：读取与校验
 
 ```ts
@@ -732,6 +735,8 @@ const HeartScene = dynamic(() => import("./heart-scene"), {
 **目标**：器官页右下角一个“问策展人”按钮；回答带 `[S1]` 引用；失败有预生成答案。
 
 **先做 Mock**（半天，不花钱）：
+
+> 现成的 12 条答案和 4 类红旗问题在 `content-pack/curator-fallback.ts`，直接复制到 `src/lib/curator-fallback.ts`，用 `pickFallback(question)` 取结果。
 
 - 点击按钮打开抽屉；
 - 显示 3 条预生成问题；
