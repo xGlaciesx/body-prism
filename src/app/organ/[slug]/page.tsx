@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAllOrgans, getOrgan } from "@/lib/content";
 import { LensTabs } from "@/components/lens-tabs";
 import { SourceList } from "@/components/source-list";
+import { AiCuratorPanel } from "@/components/ai-curator-panel";
 
 export function generateStaticParams() {
   return getAllOrgans().map((o) => ({ slug: o.slug }));
@@ -101,6 +102,8 @@ export default async function OrganPage({
         </h2>
         <SourceList sources={organ.sources} />
       </section>
+
+      <AiCuratorPanel organ={organ} />
     </main>
   );
 }
