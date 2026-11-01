@@ -1,21 +1,21 @@
 # 第一天写代码：从空文件夹到浏览器里的第一个页面
 
 > 给谁：第一次用 VSCode、第一次让 AI 改代码、第一次在真实项目里走“分支 + PR”的两个大一学生。
-> 前提：已经按 **00** 装好 Node 22、Git、VSCode、Cline，并且 GitHub 上已经有一个建好的 `body-prism` 仓库（00 会建好并推第一次）。
+> **这是参考手册，不是第二条主线。** 操作请照 [00 主线手册](00-start-here.html) 从上往下做；本篇是 §7–§11 的详细展开，卡住或想看成套示例时再翻。
 > 今天目标：**3–4 小时内**，让首页在浏览器里显示“人体棱镜”，并且这个改动通过一个 Pull Request 进入 `main`。
 > 今天**不碰**：3D、数据库、Supabase、登录、AI 接口、支付。谁先碰，谁今天做不完。
 
 > **四份文档怎么分工，别重复做**
 > | 文档 | 管什么 | 什么时候看 |
 > |---|---|---|
-> | **00 起步手册** | 装环境、配身份、建仓库、加协作者、保护 main、配 CI、第一个 PR | **只做一次**，第一天之前 |
-> | **14（本篇）** | 第一天把项目跑起来、把文档放进仓库、提交一次改动 | 第一天 |
-> | **15 每天的 Git 节奏** | 之后每天开工/收工、开分支、合并、删分支 | 第二天起 |
+> | **00 主线手册** | 装环境、建库、加人、保护 main、第一个 PR、每日节奏——**唯一主线** | **从头照着做** |
+> | **14（本篇）** | 第一天的详细版：项目、AGENTS.md、首页、提交示例 | 主线 §7–§11 的展开 |
+> | **15 每天的 Git 节奏** | 两天的完整演练、冲突、可打印清单 | 主线 §12 的展开 |
 > | **16 MVP 实施** | 先写哪个文件、每个文件放什么 | 跑通之后 |
 >
-> 00 里已经做过的动作，本篇会明确写“**跳过**”，不会让你再跑一遍。
+> **关于平台**：本篇以 **GitHub** 为例，命令和网页按钮都按 GitHub 写。Gitee 只做可选镜像（00 §13），不在上面开 PR、不在上面协作。
 
-**今天会反复出现的 8 个词，先扫一眼**（完整 15 个词见 **00 §1.5**）：
+**今天会反复出现的 8 个词，先扫一眼**（完整 15 个词见 **00 §1.1**）：
 
 | 词 | 一句话作用 |
 |---|---|
@@ -531,115 +531,529 @@ node_modules/
 
 ---
 
-## 6. 第 5 步：把文档和记忆文件提交并推到 GitHub
+## 6. 第 5 步：把文档和记忆文件提交并推到 GitHub（含开 PR 全过程）
 
 > **这一节和 00 有重叠，先分清：**
 > - **00 女孩第 6 步**已经做过“建空仓库 + 第一次 push 脚手架”；
 > - **本节**做的是“复制完团队手册、建好 AGENTS.md 之后的第二次提交”；
-> - 所以女孩**不要**再执行 `git remote add origin`（会报 `remote origin already exists`），直接跑 `git status / git add / git commit / git push`；
-> - 男孩如果已按 **00 男孩第 4 步**克隆过，**不要**再 `git clone`，否则会多一层文件夹；直接 `cd` 进项目。
+> - 所以女孩**不要**再执行 `git remote add origin`（会报 `remote origin already exists`），直接从 §6.1 开始；
+> - 男孩如果已按 **00 男孩第 7 步**克隆过，**不要**再 `git clone`，否则会多一层文件夹；直接 `cd` 进项目。
 
-### 6.1 女孩：提交团队手册和记忆文件
+### 6.0 先回答两个问题
 
-如果 **00 女孩第 6 步**已经建过 `body-prism` 仓库并 push 过，跳过“建仓库”和 `git remote add`；只做下面的提交与 push。还没建过的人，才需要先在 GitHub 网页建 **public** 仓库（不要勾 README / .gitignore / license）。
+**问题一：提交之后要不要开 Pull Request？**
 
-然后：
+**要。** 推荐以后所有改动都走 PR，理由有三个：
 
-```bash
-# 看当前分支和未提交的改动
+1. `main` 一旦开了保护，直接 push 会被拒绝，PR 是唯一入口；
+2. PR 页面会留下“谁改了什么、谁看过、CI 过没过”，这是比赛要的协作证据；
+3. 出问题时只回退一个 PR，不影响主干。
+
+> 如果你们的 `main` **还没开保护**，直接 `git push origin main` 技术上能成功。**但还是建议走一次 PR**——这是两个人的第一次完整演练，宁可现在慢 10 分钟，也别等代码多了再学。
+
+**问题二：要不要让男孩审批？**
+
+**要，只要他有 Write 权限。** 具体分三种情况：
+
+| 男孩的权限 | 他能做什么 | 合并前需要什么 |
+|---|---|---|
+| **Write**（协作者，00 §4.4 验证通过） | 能看代码、能点 **Approve**、能合并 | 他点 Approve + CI 绿 |
+| **Read**（只有读权限） | 只能看，点不了 Approve | 他在评论里写“看过，可以合并”，**女孩自己点合并** |
+| **Fork 模式**（00 §4.5） | 在自己的副本里改，能给他的 PR 评论 | 同上：评论代替 Approve，女孩合并 |
+
+> **女孩不能批准自己的 PR**——GitHub 不允许作者 Approve 自己的改动。所以“自己开、自己批”这条路走不通。
+> **如果男孩只有 Read 权限**，就别在保护规则里勾“Require approvals”，否则 PR 永远合不了；用评论 review 代替（§6.6.3）。
+
+**这一节的完整路线**（女孩 4 步 + 男孩 2 步 + 收尾 1 步）：
+
+```text
+女孩：确认状态 → 开分支 → 提交 → 推分支 → 网页开 PR
+                                              ↓
+男孩：打开 PR → 看 Files changed → Approve
+                                              ↓
+两人：等 CI 绿 → Squash and merge → 删分支 → 本地同步
+```
+
+---
+
+### 6.1 女孩：先确认自己现在在哪
+
+**在项目根目录**（有 `package.json` 的那一层）打开 PowerShell，跑三条：
+
+```powershell
+# 1. 确认这是 Git 仓库，并看当前分支
 git status
 
-# 把所有改动放进待提交区
-git add .
+# 2. 确认远程地址指向 GitHub
+git remote -v
 
-# 关键：再看一眼，确认没有 .env.local / node_modules / .next
+# 3. 看最近 3 条提交
+git log --oneline -3
+```
+
+对照结果：
+
+| 看到什么 | 说明 | 怎么做 |
+|---|---|---|
+| `On branch main` + 一堆 `Untracked files` | 正常，改动还没提交 | 继续 §6.2 |
+| `On branch feat/xxx` | 你在别的分支上 | 先 `git switch main`，再继续 |
+| `fatal: not a git repository` | 不在项目目录 | `cd $env:USERPROFILE\Projects\body-prism` |
+| `git remote -v` 没有输出 | 还没连 GitHub | 先补 §6.1.1 |
+| `origin` 指向 `gitee.com` | 远程配错了 | 改成 GitHub 地址，见 §6.1.1 |
+
+#### 6.1.1 只有远程缺失或配错时才做
+
+```powershell
+# 还没有 origin：添加 GitHub 地址（只需一次）
+git remote add origin git@github.com:xGlaciesx/body-prism.git
+
+# 已经有 origin 但地址不对：只改地址，不要重复 add
+git remote set-url origin git@github.com:xGlaciesx/body-prism.git
+
+# 确认
+git remote -v
+```
+
+用 HTTPS 就把地址换成 `https://github.com/xGlaciesx/body-prism.git`。
+
+---
+
+### 6.2 女孩：看清楚这次到底改了什么
+
+```powershell
+# 看当前分支、已跟踪文件的改动、未跟踪的新文件
 git status
 ```
 
-**第二次 `git status` 一定要看**：确认列表里没有 `.env.local`、没有 `node_modules/`、没有 `.next/`。有，就停下来检查 `.gitignore`。
+正常应该看到类似：
 
-确认后：
+```text
+On branch main
+Your branch is up to date with 'origin/main'.
 
-```bash
-# 先以当前 main 为起点新建分支并切换过去（改动会跟着过去）
+Changes not staged for commit:
+  modified:   README.md
+  modified:   .gitignore
+
+Untracked files:
+  AGENTS.md
+  docs/DECISIONS.md
+  docs/SESSION_LOG.md
+  docs/*.md
+  .env.example
+```
+
+**逐项过一遍，确认三件事：**
+
+1. **该进的都在**：`AGENTS.md`、`README.md`、`docs/` 下的手册和记忆文件、`.env.example`；
+2. **不该进的都不在**：`.env.local`、`node_modules/`、`.next/`；
+3. **没有奇怪的大文件**：原始 OBJ / PSD / Procreate、视频、压缩包。
+
+如果 `.env.local` 出现在列表里，**先停下来**：
+
+```powershell
+# 看 .gitignore 里有没有这三行
+Get-Content .gitignore | Select-String "env.local|node_modules|next"
+```
+
+没有就补进去，再 `git status` 确认它消失。**不要**用 `git add -f` 强行加。
+
+---
+
+### 6.3 女孩：开分支，再提交
+
+> **顺序很重要：先开分支，再 commit。** 如果先 commit，提交会落在本地 `main` 上，之后还要把它挪到分支，多一步且容易错。
+
+```powershell
+# 1. 从当前 main 新建分支并切过去；工作区的改动会跟着过去，不会丢
 git switch -c chore/team-handbook
 
-# 在分支上存一个提交：团队手册 + 记忆文件
+# 2. 确认已经在新分支上
+git branch --show-current
+# 应输出：chore/team-handbook
+
+# 3. 把所有改动放进待提交区
+git add .
+
+# 4. 再看一眼：这次真正会被提交的文件清单
+git status
+```
+
+第 4 步的 `git status` 应该显示一片绿色 `new file:` / `modified:`，这就是这次提交的全部内容。**发现多出来的文件，用 `git restore --staged <文件名>` 撤出待提交区。**
+
+```powershell
+# 5. 存档
 git commit -m "chore: add team handbook and agent memory files"
 
-# 第一次推送这条分支，-u 让本地分支记住远程分支
+# 6. 确认提交成功
+git log --oneline -2
+```
+
+应看到两行：最上面是刚提交的 `chore: add team handbook...`，下面是 00 里的脚手架提交。
+
+**提交信息怎么写**（以后每天都用）：
+
+```text
+<类型>: <一句话说清做了什么>
+
+类型：feat 新功能 / fix 修 bug / docs 文档 / chore 杂务 / style 样式 / refactor 重构
+好例子：docs: add medical disclaimer
+好例子：feat(home): add hero section
+坏例子：update、改了一下、111
+```
+
+---
+
+### 6.4 女孩：把分支推到 GitHub
+
+```powershell
+# 第一次推这条分支，-u 让本地分支记住远程分支
 git push -u origin chore/team-handbook
 ```
 
-> 注意顺序：**先建分支再 commit**。如果先 commit，提交会落在本地 `main` 上，之后同步时会多一步处理。
+成功会看到类似：
 
-> **为什么不直接推 main？** 00 已经给 main 开了保护，直接 `git push origin main` 会被拒绝。推分支、开 PR、男孩 Approve、再 Squash and merge——流程和 00 第 3 章「第 8 步」（8.1–8.5）完全一样，照那个走一遍即可。
-
-**只有还没做 00 女孩第 6 步的人**，才需要先补建仓库和远程地址：
-
-```bash
-# 给 GitHub 上的空仓库起别名 origin（只需一次）
-git remote add origin git@github.com:xGlaciesx/body-prism.git
-
-# 第一次推送 main，并建立跟踪关系
-git push -u origin main
+```text
+* [new branch]      chore/team-handbook -> chore/team-handbook
+branch 'chore/team-handbook' set up to track 'origin/chore/team-handbook'.
 ```
 
-如果 `remote origin already exists`，说明已经加过，不要重复 `add`，改用：
+**注意：这里推的是分支，不是 main。** 所以 `main` 有没有保护都不影响。
 
-```bash
-# 不新增，只改 origin 的地址
-git remote set-url origin git@github.com:xGlaciesx/body-prism.git
+常见报错：
 
-# 查看确认
-git remote -v
+| 报错 | 原因 | 怎么办 |
+|---|---|---|
+| `Permission denied (publickey)` | SSH 没配好 | 换 HTTPS 地址：`git remote set-url origin https://github.com/xGlaciesx/body-prism.git`，再 `git push -u origin chore/team-handbook` |
+| `Authentication failed` | 输了 GitHub 登录密码 | 用 Personal Access Token 当密码（00 §6.3） |
+| `remote: Permission to ... denied` / `403` | 当前账号对这个仓库没有写权限 | 确认登录的是 `xGlaciesx`；男孩遇到这个就走 00 §4.5 的 Fork 模式 |
+| `src refspec ... does not match any` | 分支名打错，或 commit 没成功 | `git branch --show-current` + `git log --oneline -2` 确认 |
+
+---
+
+### 6.5 女孩：在网页上开 PR（Pull Request）
+
+推到分支后，**PR 还不会自动创建**，需要去 GitHub 网页点一下。
+
+#### 6.5.1 入口 A：黄色横幅（最省事）
+
+1. 浏览器打开 `https://github.com/xGlaciesx/body-prism`；
+2. push 成功后 1–2 分钟内，页面顶部会出现一条横幅：
+
+```text
+chore/team-handbook had recent pushes less than a minute ago    [Compare & pull request]
 ```
 
-### 6.2 男孩：同步到最新代码
+3. 点右边绿色的 **Compare & pull request**。
 
-**已经按 00 男孩第 4 步克隆过的人，跳过 `git clone`**，直接：
+> 横幅有时会消失（刷新几次、或隔太久）。没关系，用入口 B。
 
-```bash
-# 进入已有的项目文件夹（00 克隆下来的那个）
-cd ~/Projects/body-prism
+#### 6.5.2 入口 B：Pull requests 标签（永远可用）
 
-# 切回 main，并拉下女孩刚合并的提交
+1. 仓库顶部点 **Pull requests**；
+2. 点右边绿色 **New pull request**；
+3. 页面上方有两个下拉框，**这一步最容易选反**：
+
+```text
+base: main          ← 要合进哪里（目标）
+compare: chore/team-handbook   ← 从哪条分支来（来源）
+```
+
+4. 选对后，页面会提示：
+
+```text
+✓ Able to merge. These branches can be automatically merged.
+```
+
+5. 往下看 **Files changed**，确认只有你这次改的文件；
+6. 点绿色 **Create pull request**。
+
+> 如果看到 `There isn't anything to compare`：说明 base 和 compare 选成了同一条分支，或者分支没推上去。
+> 如果看到 `Can't automatically merge`：说明和 main 有冲突，先按 §6.5.4 处理。
+
+#### 6.5.3 填标题和描述
+
+- **Title**（默认会带分支名，改掉）：
+
+```text
+chore: add team handbook and agent memory files
+```
+
+- **描述**（整段复制，按实际改）：
+
+```text
+## 做了什么
+- 加入 17 份开发文档（Markdown + HTML）
+- 新建 AGENTS.md、docs/SESSION_LOG.md、docs/DECISIONS.md
+- 补充 .env.example，确认 .gitignore 覆盖 .env.local
+
+## 为什么
+让两个人有同一套规则、同一份进度记录；AI 每次开工能读到同样的上下文。
+
+## 怎么验证
+- git status 确认没有 .env.local / node_modules / .next
+- 检查 docs/ 下文件齐全
+- 本次不涉及代码改动
+
+## 风险
+纯文档改动，不影响构建。
+```
+
+- 右侧 **Reviewers**：点齿轮 → 选男孩（`ziangzhang07`）。
+  - **搜不到他**：他还没接受邀请（00 §4.3），先让他点邮件里的 **Accept invitation**；
+  - **男孩只有 Read 权限**：这里仍然可以选他，但他只能评论、不能 Approve。
+- 右侧 **Assignees**：选自己（可选）。
+- 点 **Create pull request**。
+
+创建后页面地址形如 `https://github.com/xGlaciesx/body-prism/pull/1`，**把这个链接发给男孩**。
+
+#### 6.5.4 如果提示有冲突
+
+先别在网页上乱点。本地处理：
+
+```powershell
+# 切回 main 并拉最新
 git switch main
 git pull
 
-# 依赖有更新时才需要重新跑；第一次必须跑
+# 回到自己的分支
+git switch chore/team-handbook
+
+# 把最新 main 合进来
+git merge main
+```
+
+打开冲突文件，按 VSCode 的提示选“保留当前 / 保留传入 / 两者都要”，然后：
+
+```powershell
+# 标记已解决
+git add <冲突文件>
+
+# 完成合并
+git commit -m "merge: resolve conflicts with main"
+
+# 再推上去，PR 会自动更新
+git push
+```
+
+---
+
+### 6.6 男孩：review 并 Approve
+
+#### 6.6.1 打开 PR
+
+点女孩发来的链接，或：
+
+1. 打开 `https://github.com/xGlaciesx/body-prism`；
+2. 点 **Pull requests** → 找到 `chore: add team handbook...`。
+
+#### 6.6.2 看什么（3 分钟）
+
+1. 点 **Files changed**，从上往下扫；
+2. 重点看四件事：
+
+| 检查项 | 看什么 |
+|---|---|
+| 有没有密钥 | 搜 `sk-`、`API_KEY`、`SUPABASE_SERVICE_ROLE`，不该出现在任何文件里 |
+| 有没有医学越界 | 有没有诊断、开药、剂量；急症有没有“先就医” |
+| 有没有来源 | 数据、图、结论有没有标注 |
+| 有没有大文件 | 图片、模型、压缩包有没有误入 |
+
+3. 看完点右上角绿色 **Review changes**；
+4. 选 **Approve**，写一句：
+
+```text
+看过，文档结构清楚，没有密钥和医学越界内容。
+```
+
+5. 点 **Submit review**。
+
+#### 6.6.3 如果 Approve 点不了
+
+| 现象 | 原因 | 怎么办 |
+|---|---|---|
+| 按钮区只有 Comment，没有 Approve | 男孩没有 Write 权限 | 选 **Comment**，写“看过，可以合并”，由女孩合并 |
+| 提示 `You can't approve your own pull request` | 这是女孩自己在看 | 正常，必须由男孩批 |
+| 提示 `Pull request reviews are disabled` | 仓库设置关了 review | Settings → General → 打开 Pull request reviews |
+| 男孩根本打不开仓库 | 邀请没接受 / 没权限 | 回 00 §4.3 接受邀请，或走 00 §4.5 Fork |
+
+> **Approve 不等于合并。** Approve 只是“我看过了”；合并是另一步（§6.8）。有 Write 权限的男孩也可以自己点合并，但第一次建议由女孩合并，让两个人各走一遍。
+
+---
+
+### 6.7 两个人一起看 CI（自动检查）
+
+#### 6.7.1 在哪里看
+
+三个地方都行：
+
+1. **PR 页面最底部**：一块检查区；
+2. **PR 页面顶部**的 **Checks** 标签；
+3. 仓库顶部的 **Actions** 标签（看历史运行）。
+
+#### 6.7.2 四种状态
+
+| 显示 | 含义 | 怎么办 |
+|---|---|---|
+| 黄色圆圈，`Some checks haven't completed yet` | 正在跑 | 等 1–3 分钟，刷新页面 |
+| 绿色对勾，`All checks have passed` | 通过 | 可以合并 |
+| 红色叉，`Some checks have failed` | 失败 | 点 **Details** 看日志，把报错整段贴给 Cline |
+| 完全没有检查区 | CI 没配 / 没提交 / Actions 被禁用 | 见 §6.7.3 |
+
+#### 6.7.3 完全没有 CI 的情况
+
+按顺序排查：
+
+1. 仓库里有没有 `.github/workflows/ci.yml`？（在 GitHub 网页上能看到才算）
+2. 这个文件在 `main` 上吗？PR 分支里才加的话，第一次可能不触发；
+3. **Settings → Actions → General** → 是否选了 **Allow all actions and reusable workflows**；
+4. 仓库是不是 fork？fork 默认不跑 Actions，要去 **Actions** 标签点 **I understand my workflows, go ahead and enable them**。
+
+没有 CI 也能合并——只是少一道自动检查。第一次先把 PR 流程走通，CI 可以随后补（00 §10.2）。
+
+---
+
+### 6.8 女孩：合并
+
+前提：**CI 绿（或没有 CI）+ 男孩已 Approve（或有 Write 的人批过）**。
+
+1. 回到 PR 页面，滚到底部；
+2. 点绿色 **Squash and merge**；
+3. 弹窗里确认提交信息，改成干净的一句：
+
+```text
+chore: add team handbook and agent memory files (#1)
+```
+
+4. 点 **Confirm squash and merge**；
+5. 页面提示 `Pull request successfully merged and closed` 后，点 **Delete branch**（删的是 GitHub 上的远端分支）。
+
+> 为什么用 **Squash**？把分支上的多次零碎提交压成 `main` 上的一条，历史干净，回退也简单。
+
+#### 6.8.1 合并按钮是灰的？
+
+鼠标停在按钮上，会显示原因：
+
+| 提示 | 原因 | 怎么办 |
+|---|---|---|
+| `Review required` | 还没有 Approve | 让男孩点 Approve；或检查他有没有 Write |
+| `Required status check "lint-build" is expected` | CI 没跑 / 没配 | 等 CI；或 Settings → Branches 里先取消这条 |
+| `This branch has conflicts that must be resolved` | 和 main 冲突 | 按 §6.5.4 本地解决后 push |
+| `Merging is blocked` | 保护规则 / 权限 | 确认自己是 Admin；确认规则没勾“禁止管理员绕过”且你需要绕过 |
+| 按钮直接不存在 | 你没有写权限 | 让有权限的人合 |
+
+> **不要为了合并去关保护。** 卡住就按表处理；实在不行把提示原文发给对方或 Cline。
+
+---
+
+### 6.9 合并之后：两个人各自同步
+
+**女孩（合并的人）：**
+
+```powershell
+# 切回 main
+git switch main
+
+# 拉下刚合并的提交
+git pull
+
+# 确认历史里有这条
+git log --oneline -3
+
+# 删除本地分支（已合并）
+git branch -d chore/team-handbook
+```
+
+如果提示 `error: The branch 'chore/team-handbook' is not fully merged`：
+
+- **先确认 PR 真的是 Merged 状态**（不是 Closed）；
+- 确认后用大写 `-D`：
+
+```powershell
+# 强制删除本地分支（只在确认 PR 已合并时用）
+git branch -D chore/team-handbook
+```
+
+> squash 合并后，本地分支的原始提交不在 main 的历史里，所以 `-d` 会误判“未合并”。这是正常的。
+
+**男孩：**
+
+```bash
+# 进入项目
+cd ~/Projects/body-prism
+
+# 切回 main 并拉取
+git switch main
+git pull
+
+# 依赖有更新时才需要；第一次必须跑
 npm install
 
-# 启动本地开发服务器，浏览器打开 http://localhost:3000
+# 启动，浏览器打开 http://localhost:3000
 npm run dev
 ```
 
-**还没克隆过的人**，先补这一步：
+**两个人都做一次最终确认：**
 
 ```bash
-# 回到放项目的上级目录
-cd ~/Projects
-
-# 把 GitHub 上的仓库整个下载到本地（第一次用 clone，之后用 pull）
-git clone git@github.com:xGlaciesx/body-prism.git
-
-# 进入刚下载下来的项目文件夹
-cd body-prism
-```
-
-看到首页就成功。**不要**再跑 `create-next-app`，否则会多出一层嵌套文件夹。
-
-### 6.3 两个人都要确认
-
-```bash
-# 看最近 3 条提交，确认历史在
+# 最近 3 条提交
 git log --oneline -3
 
-# 看远程地址，确认 origin 指向 GitHub
+# 远程地址
 git remote -v
+
+# 当前分支（应该是 main，且没有未提交改动）
+git status
 ```
 
-`git remote -v` 应该看到 `origin` 指向 `github.com`。如果看到的是 `https://...` 也可以，只是每次 push 可能要输令牌。
+`git status` 应显示 `On branch main` + `Your branch is up to date with 'origin/main'.` + `nothing to commit, working tree clean`。
+
+---
+
+### 6.10 如果男孩还没接受邀请 / 没有权限
+
+按顺序试，**不要卡在设置页**：
+
+1. **让他查邀请**：GitHub 右上角铃铛，或邮箱 `1248696312@qq.com` 里的 **Accept invitation**；
+2. **女孩查状态**：Settings → Collaborators，男孩那行应是 **Collaborator**，不是 **Pending invite**；
+3. **如果角色是 Read**：点下拉改 **Write**（改不了见 00 §4.2 的组织账号说明）；
+4. **如果确实没有 Write**：
+   - 保护规则里**不要勾** “Require approvals”；
+   - 男孩用 **Comment** 代替 Approve；
+   - 或者直接走 00 §4.5 的 **Fork 模式**。
+
+**不要为了让他能批，就把仓库转成组织、或把 Admin 给他。** 两个人做比赛项目，Write 足够。
+
+---
+
+### 6.11 这一次之后，下次就固定了
+
+以后每次改动都是同一个循环，只是分支名和提交信息不同：
+
+```text
+git switch main → git pull → git switch -c feat/xxx
+→ 改代码 → npm run lint → npm run build
+→ git add → git commit → git push -u origin feat/xxx
+→ 网页开 PR → 对方 Approve → CI 绿 → Squash and merge → Delete branch
+→ git switch main → git pull → git branch -d feat/xxx
+```
+
+每天 20 分钟的完整节奏见 [15 每天的 Git 节奏](15-daily-git-rhythm.html)。
+
+---
+
+### 6.12 这一节最容易卡住的 8 个地方
+
+| # | 现象 | 一句话解决 |
+|---|---|---|
+| 1 | `remote origin already exists` | 不要重复 `add`，用 `git remote set-url origin <地址>` |
+| 2 | push 后网页没有黄色横幅 | 用 **Pull requests → New pull request**，别等横幅 |
+| 3 | PR 显示 `There isn't anything to compare` | base 选 `main`，compare 选你的分支，别选反 |
+| 4 | Approve 按钮是灰的 / 只有 Comment | 男孩没有 Write；用评论代替，或改权限 |
+| 5 | 女孩想批自己的 PR | GitHub 不允许；必须男孩批 |
+| 6 | 合并按钮灰，提示 `Review required` | 还没有有效 Approve；确认男孩有 Write |
+| 7 | 合并后 `git branch -d` 报未合并 | squash 的正常现象；确认已合并后用 `-D` |
+| 8 | 提交里混进 `.env.local` | **立刻吊销该 Key**，再从历史移除；旧 Key 仍算泄露 |
 
 ---
 
@@ -852,7 +1266,7 @@ git push
 
 ### 9.4 开 PR 并合并
 
-详细图文步骤见 **00 第 3 章「第 8 步」下的 8.1–8.5**，这里只列顺序：
+详细图文步骤见本篇 **§6.5–§6.8**（和 00 §11 完全一致），这里只列顺序：
 
 1. 打开 GitHub 仓库网页，点黄色条 **Compare & pull request**；没有黄色条就点 **Pull requests → New pull request**，base 选 `main`、compare 选 `feat/home-hero`；
 2. 标题：`feat(home): add static hero and three lens cards`；
