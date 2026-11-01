@@ -67,7 +67,7 @@ export const brain: OrganContent = {
       lens: "relationship",
       text: "睡眠不足会改变注意力、情绪调节和代谢指标，具体影响因人而异。",
       evidenceLevel: "B",
-      sourceIds: ["SRC-BRAIN-003"],
+      sourceIds: ["SRC-BRAIN-001"],
     },
     {
       id: "C-BRAIN-INFO-1",
