@@ -1,26 +1,46 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * 设计系统（对应团队手册 07 §4）
+ * 纸墨配色：暖白纸面 + 近黑墨水，三种镜片各一个强调色。
+ */
+@theme {
+  /* 纸与墨 */
+  --color-paper: #f7f2e8;
+  --color-paper-2: #fffdf8;
+  --color-ink: #1c1a17;
+  --color-muted: #6f675c;
+  --color-line: #ded4c5;
+
+  /* 三种镜片 */
+  --color-structure: #a6474f; /* 结构之镜 */
+  --color-relationship: #c98a3e; /* 关系之镜 */
+  --color-information: #2f8f9d; /* 信息之镜 */
+
+  /* 证据与状态 */
+  --color-evidence: #6f7f6a; /* A/B 级证据 / 通过 */
+  --color-danger: #b03a2e;
+  --color-focus: #2f8f9d;
+
+  /* 字体（07 §4.3：标题衬线、正文无衬线、编号等宽） */
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei",
+    ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }
+
+::selection {
+  background-color: var(--color-structure);
+  color: var(--color-paper-2);
+}
+
