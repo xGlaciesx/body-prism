@@ -4,16 +4,15 @@ import { useState } from "react";
 import {
   curatorFallback,
   pickFallback,
-  type CuratorAnswer,
+  type CuratorResult,
 } from "@/lib/curator-fallback";
-import type { OrganContent, Source } from "@/lib/schema";
+import type { OrganContent } from "@/lib/schema";
 
 export function AiCuratorPanel({ organ }: { organ: OrganContent }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [result, setResult] = useState<ReturnType<typeof pickFallback> | null>(
-    null,
-  );
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<CuratorResult | null>(null);
 
   // 3 条预置问题：本器官的 2 条固定问答 + 1 条红旗演示。
   const presets = [
@@ -23,17 +22,47 @@ export function AiCuratorPanel({ organ }: { organ: OrganContent }) {
     "我胸痛怎么办？",
   ];
 
-  const ask = (question: string) => {
-    setResult(pickFallback(question));
+  const localFallback = (question: string): CuratorResult => {
+    const fb = pickFallback(question);
+    if (fb.kind === "urgent") {
+      return { kind: "urgent", urgentMessage: fb.urgentMessage ?? "" };
+    }
+    if (fb.kind === "answer" && fb.answer) {
+      const sourceIds = new Set<string>();
+      for (const claimId of fb.answer.sourceClaimIds) {
+        const claim = organ.claims.find((c) => c.id === claimId);
+        claim?.sourceIds.forEach((sid) => sourceIds.add(sid));
+      }
+      return {
+        kind: "answer",
+        answer: fb.answer.answer,
+        sourceIds: organ.sources
+          .filter((s) => sourceIds.has(s.id))
+          .map((s) => s.id),
+      };
+    }
+    return { kind: "default" };
   };
 
-  const resolveSources = (answer: CuratorAnswer): Source[] => {
-    const sourceIds = new Set<string>();
-    for (const claimId of answer.sourceClaimIds) {
-      const claim = organ.claims.find((c) => c.id === claimId);
-      claim?.sourceIds.forEach((sid) => sourceIds.add(sid));
+  const ask = async (question: string) => {
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/curator", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ organSlug: organ.slug, question }),
+      });
+      if (res.ok) {
+        setResult((await res.json()) as CuratorResult);
+      } else {
+        setResult(localFallback(question));
+      }
+    } catch {
+      setResult(localFallback(question));
+    } finally {
+      setLoading(false);
     }
-    return organ.sources.filter((s) => sourceIds.has(s.id));
   };
 
   return (
@@ -58,9 +87,7 @@ export function AiCuratorPanel({ organ }: { organ: OrganContent }) {
         >
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-serif text-lg font-semibold">AI 策展人</h2>
-            <span className="shrink-0 rounded-full border border-line bg-paper px-2.5 py-0.5 text-xs text-muted">
-              演示模式 · 固定回答
-            </span>
+            <span className="shrink-0 text-xs text-muted">回答带来源引用</span>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -98,7 +125,9 @@ export function AiCuratorPanel({ organ }: { organ: OrganContent }) {
             </button>
           </form>
 
-          {result ? (
+          {loading ? (
+            <p className="text-sm text-muted">策展人正在思考…</p>
+          ) : result ? (
             result.kind === "urgent" ? (
               <div className="rounded-xl border border-danger bg-danger/10 p-4">
                 <p className="text-sm font-semibold text-danger">⚠ 请先就医</p>
@@ -106,12 +135,27 @@ export function AiCuratorPanel({ organ }: { organ: OrganContent }) {
                   {result.urgentMessage}
                 </p>
               </div>
-            ) : result.kind === "answer" && result.answer ? (
-              <AnswerView
-                answer={result.answer}
-                sources={resolveSources(result.answer)}
-                onNavigate={() => setOpen(false)}
-              />
+            ) : result.kind === "answer" ? (
+              <div className="rounded-xl border border-line bg-paper p-4">
+                <p className="text-sm leading-relaxed text-ink">
+                  {result.answer}
+                </p>
+                {result.sourceIds.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
+                    <span>来源：</span>
+                    {result.sourceIds.map((id) => (
+                      <a
+                        key={id}
+                        href={`#${id}`}
+                        onClick={() => setOpen(false)}
+                        className="font-mono text-information hover:underline"
+                      >
+                        {id}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             ) : (
               <div className="rounded-xl border border-line bg-paper p-4 text-sm leading-relaxed text-muted">
                 这个问题超出了站内六个器官的范围。换个问法，或去「方法与证据」页了解我们的证据分级。
@@ -121,36 +165,5 @@ export function AiCuratorPanel({ organ }: { organ: OrganContent }) {
         </div>
       ) : null}
     </>
-  );
-}
-
-function AnswerView({
-  answer,
-  sources,
-  onNavigate,
-}: {
-  answer: CuratorAnswer;
-  sources: Source[];
-  onNavigate: () => void;
-}) {
-  return (
-    <div className="rounded-xl border border-line bg-paper p-4">
-      <p className="text-sm leading-relaxed text-ink">{answer.answer}</p>
-      {sources.length > 0 ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
-          <span>来源：</span>
-          {sources.map((s) => (
-            <a
-              key={s.id}
-              href={`#${s.id}`}
-              onClick={onNavigate}
-              className="font-mono text-information hover:underline"
-            >
-              {s.id}
-            </a>
-          ))}
-        </div>
-      ) : null}
-    </div>
   );
 }

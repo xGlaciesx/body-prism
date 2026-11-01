@@ -181,3 +181,9 @@ export function pickFallback(question: string): {
 
   return { kind: "default" };
 }
+
+/** 策展人统一的返回结构（真实模型与本地兜底共用）。sourceIds 是来源 ID。 */
+export type CuratorResult =
+  | { kind: "answer"; answer: string; sourceIds: string[] }
+  | { kind: "urgent"; urgentMessage: string }
+  | { kind: "default" };
