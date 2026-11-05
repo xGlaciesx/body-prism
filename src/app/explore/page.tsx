@@ -4,7 +4,7 @@ import { organs } from "@/content/organs";
 
 export const metadata: Metadata = {
   title: "身体地图",
-  description: "六个器官，三种读法。选择一个开始探索。",
+  description: `${organs.length} 个器官，三种读法。选择一个开始探索。`,
 };
 
 export default function ExplorePage() {
@@ -13,7 +13,7 @@ export default function ExplorePage() {
       <header className="border-b border-line pb-6">
         <h1 className="font-serif text-3xl font-bold sm:text-4xl">身体地图</h1>
         <p className="mt-3 text-muted">
-          六个器官，三种读法。选择一个开始，每条说法都会标上证据等级。
+          {organs.length} 个器官，三种读法。选择一个开始，每条说法都会标上证据等级。
         </p>
       </header>
 
