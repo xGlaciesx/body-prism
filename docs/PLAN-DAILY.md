@@ -2,19 +2,22 @@
 
 > 唯一执行计划是 `docs/plan/PLAN-V4-implementation.md`。这份文件是「今天该干哪张卡」的滚动版：D1–D7 两人的提示词块已全部预生成；每天收工后同步一次，只重写「明天及以后」，今天和以前的不动。
 
-**状态概览：** 第 0 天 / 7 · 已完成 0 / 15 张卡 · 剩余 7 天 · 截止日期 2026-11-12
+**状态概览：** 第 1 天 / 7 · 已完成 2 / 15 张卡（T0、T2）· 剩余 6 天 · 截止日期 2026-11-12
 
 ## 更新记录
 
 | 日期 | 谁改的 | 改了什么 | 为什么 |
 |---|---|---|---|
 | 2026-11-05 | AI（Cline） | 初版：预生成 D1–D7 七天计划与两人提示词块 | 升级到 v4，产出每日滚动计划 |
+| 2026-11-06 | AI（Cline） | D1 收工：T0/T2 完成、T1 缺 .env.example、T3 数据已落地但医学审核未做；重排 D2–D7 | 女孩忘记更新，代更；进度偏慢 |
+| 2026-11-06 | AI（Cline） | 砍 T11 别名搜索、T14 三维入口 | 均为 P1 可砍项，不阻塞核心演示链路，时间留给医学审核与 AI 链路 |
+| 2026-11-06 | AI（Cline） | 守恒检查：T0–T14 共 15 卡，T0/T2 已完成，T1/T3 顺延 D2，T4–T10/T12/T13 排 D2–D7，T11/T14 已砍 | 无卡片凭空消失 |
 
 ---
 
 ## D1 · 2026-11-06（周五）
 
-**状态：** ⬜ 未开始
+**状态：** ⚠️ 部分完成 —— T0、T2 已完成；T1 缺 `.env.example`（护栏 5 个文件只建了 4 个）；T3 影响链数据已落地（impact-graph + 5 扩展器官），但 56 条边的医学审核未做
 
 ### 李若溪（A 线 · 工程）
 
@@ -74,12 +77,12 @@
 
 ### 李若溪（A 线 · 工程）
 
-- **任务卡：** P2 · T4（影响链的三个纯函数）
+- **任务卡：** P2 · T1 收尾（.env.example）、P2 · T4（影响链的三个纯函数）
 - **做三件事：**
-  1. ① 建 `src/lib/chain.ts`：`getSubgraph(organSlug)`、`getChainPaths(from,to)`、`getChainRenderState(organSlug)`
-  2. ② 建 `src/lib/chain.test.ts`，给三个函数写测试
-  3. ③ 跑 `npm run test` 全绿
-- **完成标志：** `npm run test` 全绿，`getSubgraph("heart")` 能返回心及其直接/次邻节点
+  1. ① 补根目录 `.env.example`（只写 `DEEPSEEK_API_KEY=`，不填真值）
+  2. ② 建 `src/lib/chain.ts`：`getSubgraph(organSlug)`、`getChainPaths(from,to)`、`getChainRenderState(organSlug)`
+  3. ③ 建 `src/lib/chain.test.ts`，跑 `npm run test` 全绿
+- **完成标志：** `.env.example` 存在且不填真值；`npm run test` 全绿
 - **收工命令：**
   ```powershell
   npm run test
@@ -89,21 +92,22 @@
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T4，目标是把影响链的三个纯函数（取子图、找路径、生成渲染态）写完并配测试。
-只改：新建 src/lib/chain.ts、src/lib/chain.test.ts。
+今天做 P2 · T1 收尾 + T4，目标是把 .env.example 补上、把影响链三个纯函数写完并配测试。
+只改：新建 .env.example、src/lib/chain.ts、src/lib/chain.test.ts。
 不许改：src/content/impact-graph.ts 的节点和边、医学表述、docs/plan/ 原件、不装依赖。
-做完跑：npm run test。
+.env.example 内容：只写一行 DEEPSEEK_API_KEY=（空值），不填真实 key。
+做完跑：npm run test；npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T3（影响链数据落地）
+- **任务卡：** P2 · T3（影响链数据落地 · 医学审核收口）
 - **做三件事：**
   1. ① 确认 `src/content/impact-graph.ts` 已就位（44 节点 / 56 边）
-  2. ② 逐条核对 5 条中医「表里」边（D 级）的表述与 caveat
-  3. ③ 把审核结果记进 `docs/medical-review-impact-graph.md`
-- **完成标志：** `impactEdges` 数出 56 条、`impactNodes` 44 个；5 条 D 级边都标「传统理论」
+  2. ② 逐条核对全部 56 条边的 `mechanism` 与 `evidenceLevel`（重点 5 条中医 D 级「表里」边）
+  3. ③ 把审核结果记进 `docs/medical-review-impact-graph.md`（四列表格，56 行）
+- **完成标志：** `docs/medical-review-impact-graph.md` 有 56 行审核记录；5 条 D 级边都标「传统理论」
 - **收工命令：**
   ```bash
   npm run test
@@ -113,11 +117,13 @@
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T3，目标是把影响链数据落地并逐条核对，让 44 节点 / 56 边对得上。
-只改：确认 src/content/impact-graph.ts 已就位；如需改医学表述，只改 src/content/ 下数据文件，并先记到 docs/medical-review-impact-graph.md。
-不许改：docs/plan/content-pack/ 原件（只读素材）、组件与页面代码。
-做完跑：npm run test。
-做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
+今天做 P2 · T3 医学审核，目标是把 56 条边逐条核对并写成审核记录。
+只改：新建 docs/medical-review-impact-graph.md（审核记录）。
+不许改：src/content/impact-graph.ts 的机制和证据等级（数据已落地，只审核不改代码，发现问题先记进记录再单独处理）、docs/plan/ 原件。
+审核格式：四列表格（边 id / 原证据等级 / 审核结论 / 修改说明），56 条边逐条一行。
+重点：5 条中医「表里」边（D 级）必须标「传统理论」。
+做完跑：npm run test（确认校验仍绿）。
+做完停下来，把审核结论汇总告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ---
@@ -292,25 +298,25 @@
 
 ### 李若溪（A 线 · 工程）
 
-- **任务卡：** P2 · T11（别名搜索）、T13（首页首屏）、T14（三维入口）
+- **任务卡：** P2 · T13（首页首屏叙事）
 - **做三件事：**
-  1. ① T11：建 `src/content/search-aliases.ts` + `src/lib/search.ts`(+测试)，/chain 加搜索框
-  2. ② T13：改 `src/app/page.tsx` 首屏（三段式 + 两按钮 + 免责小字，右侧留空给三维）
-  3. ③ T14：建 `src/components/organ-viewer.tsx` + `src/types/model-viewer.d.ts`，package.json 加 `@google/model-viewer`，首页右侧放三维
-- **完成标志：** 首页首屏三段式可读；三维能转、12 热点能点；搜「心慌」能定位心悸节点
+  1. ① 改 `src/app/page.tsx` 首屏（三段式 + 两按钮 + 免责小字）
+  2. ② 与 README、视频第一镜口径对齐
+  3. ③ 手机宽度不横向滚动
+- **完成标志：** 首页首屏三段式可读、手机一屏可见
 - **收工命令：**
   ```powershell
   npm run test
   npm run build
   ```
-- **卡住先看：** P2 · T11、P2 · T13、P2 · T14、D17 §4.2
+- **卡住先看：** P2 · T13、D07 §3
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T11、T13、T14，目标是把首页首屏讲清背景、接上三维入口、并给 /chain 加别名搜索。
-只改：新建 src/content/search-aliases.ts、src/lib/search.ts(+test)、src/components/organ-viewer.tsx、src/types/model-viewer.d.ts；修改 src/app/page.tsx、src/app/chain/page.tsx、chain-view.tsx、package.json（只加 @google/model-viewer）。
-不许改：/chain 页面的医学内容、src/content 下器官正文、docs/plan/ 原件；不装 three/@react-three/动画库/UI 库；模型不从 base64 内联；meshopt 解码器那一行不能省。
+今天做 P2 · T13，目标是把首页首屏改写成三段式叙事：一句话定位 + 三镜入口 + 免责小字，与 README 和视频第一镜口径一致。
+只改：src/app/page.tsx。
+不许改：/chain 页面的医学内容、src/content 下器官正文、docs/plan/ 原件；不装依赖。
 做完跑：npm run test；npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
@@ -320,7 +326,7 @@
 - **任务卡：** P2 · T13（文字对齐）+ 医学审核收口 + README
 - **做三件事：**
   1. ① T13：README 开头三段式压缩成两句，与首页副标题口径一致
-  2. ② 补 `docs/medical-review-impact-graph.md`（T3 审核记录填满 34 行）
+  2. ② 补 `docs/medical-review-impact-graph.md`（T3 审核记录填满 56 行）
   3. ③ README 补「AI 部分是怎么做的」一节
 - **完成标志：** README 首段与首页副标题口径一致；医学审核记录填满
 - **收工命令：**
