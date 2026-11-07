@@ -65,7 +65,7 @@ export const gallbladder: OrganContent = {
       id: "C-GB-REL-3",
       lens: "relationship",
       text: "中医“肝与胆相表里”是传统理论表述，把胆描述为“中正之官、决断出焉”，与胆囊的储存功能不是一回事。",
-      evidenceLevel: "D",
+      evidenceLevel: "C",
       sourceIds: ["SRC-GB-004"],
       caveat: "传统理论，非现代医学共识。",
     },
@@ -127,7 +127,7 @@ export const gallbladder: OrganContent = {
       title: "《黄帝内经·素问·灵兰秘典论》（传统理论原文）",
       year: 2016,
       type: "traditional",
-      level: "D",
+      level: "C",
       note: "“胆者，中正之官，决断出焉。”原典成书年代无确切年份，年份字段按 schema（≥1900）填占位值，仅用于排序。",
     },
     {

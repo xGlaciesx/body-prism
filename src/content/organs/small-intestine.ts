@@ -64,7 +64,7 @@ export const smallIntestine: OrganContent = {
       id: "C-SI-REL-2",
       lens: "relationship",
       text: "中医“心与小肠相表里”“小肠者受盛之官，化物出焉”是传统理论表述，不是现代解剖学的功能描述。",
-      evidenceLevel: "D",
+      evidenceLevel: "C",
       sourceIds: ["SRC-SI-003"],
       caveat: "传统理论，非现代医学共识。",
     },
@@ -118,7 +118,7 @@ export const smallIntestine: OrganContent = {
       title: "《黄帝内经·素问·灵兰秘典论》（传统理论原文）",
       year: 2016,
       type: "traditional",
-      level: "D",
+      level: "C",
       note: "“小肠者，受盛之官，化物出焉。”原典成书年代无确切年份，年份字段按 schema（≥1900）填占位值，仅用于排序。",
     },
     {

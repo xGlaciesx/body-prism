@@ -65,7 +65,7 @@ export const spleen: OrganContent = {
       id: "C-SPLEEN-REL-2",
       lens: "relationship",
       text: "中医所说的“脾主运化”是传统理论表述，指的是消化吸收功能，与解剖学上的脾脏不是同一个概念。",
-      evidenceLevel: "D",
+      evidenceLevel: "C",
       sourceIds: ["SRC-SPLEEN-004"],
       caveat: "传统理论，非现代医学共识；同名不同物是中医与西医对照时最常见的误会。",
     },
@@ -127,7 +127,7 @@ export const spleen: OrganContent = {
       title: "《黄帝内经·素问·灵兰秘典论》（传统理论原文）",
       year: 2016,
       type: "traditional",
-      level: "D",
+      level: "C",
       note: "“脾胃者，仓廪之官，五味出焉。”原典成书年代无确切年份，年份字段按 schema（≥1900）填占位值，仅用于排序。",
     },
     {

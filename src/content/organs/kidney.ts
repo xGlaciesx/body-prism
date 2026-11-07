@@ -124,7 +124,7 @@ export const kidney: OrganContent = {
       title: "《黄帝内经·素问》（传统理论文献）",
       year: 2026,
       type: "traditional",
-      level: "D",
+      level: "C",
       note: "传统理论，非现代医学共识；仅用于说明概念差异。",
     },
   ],
