@@ -2,7 +2,7 @@
 
 > 唯一执行计划是 `docs/plan/PLAN-V4-implementation.md`。这份文件是「今天该干哪张卡」的滚动版：D1–D7 两人的提示词块已全部预生成；每天收工后同步一次，只重写「明天及以后」，今天和以前的不动。
 
-**状态概览：** 第 1 天 / 7 · 已完成 2 / 15 张卡（T0、T2）· 剩余 6 天 · 截止日期 2026-11-12
+**状态概览：** 第 2 天 / 7 · 已完成 4 / 15 张卡（T0、T1、T2、T4）· 剩余 5 天 · 截止日期 2026-11-12
 
 ## 更新记录
 
@@ -12,6 +12,8 @@
 | 2026-11-06 | AI（Cline） | D1 收工：T0/T2 完成、T1 缺 .env.example、T3 数据已落地但医学审核未做；重排 D2–D7 | 女孩忘记更新，代更；进度偏慢 |
 | 2026-11-06 | AI（Cline） | 砍 T11 别名搜索、T14 三维入口 | 均为 P1 可砍项，不阻塞核心演示链路，时间留给医学审核与 AI 链路 |
 | 2026-11-06 | AI（Cline） | 守恒检查：T0–T14 共 15 卡，T0/T2 已完成，T1/T3 顺延 D2，T4–T10/T12/T13 排 D2–D7，T11/T14 已砍 | 无卡片凭空消失 |
+| 2026-11-07 | AI（Cline） | D2 收工：T1 收尾（.env.example）、T4 三个纯函数+测试完成；T3 审核记录已生成（56 行、5 条中医边改 C），终审签字顺延 D3 | 女孩完成 A 线；T3 终审待张子昂本人签字 |
+| 2026-11-07 | AI（Cline） | 守恒检查：T0/T1/T2/T4 已完成，T3 终审顺延 D3，T5–T10/T12/T13 排 D3–D7，T11/T14 已砍 | 无卡片凭空消失 |
 
 ---
 
@@ -73,7 +75,7 @@
 
 ## D2 · 2026-11-07（周六）
 
-**状态：** ⬜ 未开始
+**状态：** ⚠️ 部分完成 —— 李若溪 T1 收尾（.env.example 已补）+ T4（src/lib/chain.ts 三个纯函数 + chain.test.ts，7/7 测试绿）完成；张子昂 T3 审核记录已生成（56 行、5 条中医边改 C），医学终审签字未完成
 
 ### 李若溪（A 线 · 工程）
 
@@ -137,7 +139,7 @@
 - **任务卡：** P2 · T5（`/chain` 页面骨架）
 - **做三件事：**
   1. ① 建 `src/app/chain/page.tsx`（Server Component，取 organ + 数据）
-  2. ② 建 `src/components/chain-canvas.tsx`（"use client"，用 `getChainRenderState` 画节点+边）
+  2. ② 建 `src/components/chain-canvas.tsx`（"use client"，用 `getChainRenderState` + `layoutChain` + `edgeDash` 画节点+边）
   3. ③ 接 `?organ=` 参数，验证 `/chain?organ=heart` 能渲染
 - **完成标志：** 访问 `/chain?organ=heart` 能看到一条链（节点 + 连线），无 3D 依赖
 - **收工命令：**
@@ -150,33 +152,42 @@
 
 ```text
 今天做 P2 · T5，目标是搭出 /chain 页面骨架，让 ?organ=heart 能看到一条影响链。
+先读：src/lib/chain.ts（T4 已定稿，直接用）、src/content/impact-graph.ts（类型与数据，不改）。
 只改：新建 src/app/chain/page.tsx、src/components/chain-canvas.tsx。
 不许改：src/lib/chain.ts 的逻辑、impact-graph 数据；画图用 SVG，不装 three / @react-three。
+T4 已定稿的接口（不要重写）：
+- getChainRenderState(sel, nodes, edges) → { nodeOpacity, edgeState: "idle"|"active"|"dimmed", visibleNodeIds }
+- layoutChain(nodes) → Record<id, { x, y }>（x/y 都是 0~1 比例，乘容器尺寸得像素）
+- edgeDash(level) → { strokeWidth, dash?, opacity }
+- type ChainSelection = { organId: string | null, path: { from, to }[] | null }
 做完跑：npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T8（AI 策展人接口，步骤 1–6，先不接模型）
+- **任务卡：** P2 · T3（医学终审签字 · 收尾）、P2 · T8（AI 策展人接口，步骤 1–6，先不接模型）
 - **做三件事：**
-  1. ① 建 `src/app/api/curator/route.ts`（POST 接口骨架）
-  2. ② 步骤 1–6：取 `organSlug` + `question` → `getSubgraph` 取子图 → 校验路径/来源
-  3. ③ 不接 DeepSeek，先用 fallback 返回，确认响应结构对
-- **完成标志：** `curl -X POST /api/curator` 返回符合 schema 的 JSON（含 `mode`/`path`/`notice`），且不调模型
+  1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
+  2. ② T8：建 `src/app/api/curator/route.ts`（POST 接口骨架），取 `organSlug` + `question` → `getImpactSubgraph` 取子图 → 校验路径/来源
+  3. ③ T8：不接 DeepSeek，先用 fallback 返回，确认响应结构对
+- **完成标志：** T3 审核记录「医学终审 / 结论」两栏填齐并签字；`curl -X POST /api/curator` 返回符合 schema 的 JSON（含 `mode`/`path`/`notice`），且不调模型
 - **收工命令：**
   ```bash
   npm run build
   curl -X POST http://localhost:3000/api/curator -H "Content-Type: application/json" -d '{"organSlug":"heart","question":"运动时心率为什么变快"}'
   ```
-- **卡住先看：** P2 · T8、P2 · T4、D05 §5（成本/token 预算）
+- **卡住先看：** P2 · T3、P2 · T8、P2 · T4、D05 §5（成本/token 预算）
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
 今天做 P2 · T8（步骤 1–6），目标是把 /api/curator 接口骨架跑通：取子图、校验、返回结构，先不接模型。
+（T3 医学终审是张子昂本人的活，不在这条提示词里；Cline 只做结构校验，不做医学结论。）
+先读：src/content/impact-graph.ts 已导出的 getImpactSubgraph(organId)、subgraphToPrompt(organId)。
 只改：新建 src/app/api/curator/route.ts。
 不许改：前端页面、src/content 医学表述；不要把 API key 写进代码或前端。
+接口要点：organId = "organ:" + organSlug，调 getImpactSubgraph 取子图，校验路径/来源，先返回 fallback。
 做完跑：npm run build；再 curl POST /api/curator 确认返回 JSON 结构。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
@@ -323,12 +334,12 @@
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T13（文字对齐）+ 医学审核收口 + README
+- **任务卡：** P2 · T13（文字对齐）+ README
 - **做三件事：**
   1. ① T13：README 开头三段式压缩成两句，与首页副标题口径一致
-  2. ② 补 `docs/medical-review-impact-graph.md`（T3 审核记录填满 56 行）
-  3. ③ README 补「AI 部分是怎么做的」一节
-- **完成标志：** README 首段与首页副标题口径一致；医学审核记录填满
+  2. ② README 补「AI 部分是怎么做的」一节
+  3. ③ 复核 `docs/medical-review-impact-graph.md` 终审签字已齐（T3 顺延项，D3 完成）
+- **完成标志：** README 首段与首页副标题口径一致；审核记录终审签字齐
 - **收工命令：**
   ```bash
   npm run build
@@ -338,8 +349,8 @@
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T13（文字对齐）+ 医学审核收口，目标是把 README、首页、视频第一镜口径对齐，并填满影响链审核记录。
-只改：README.md、docs/medical-review-impact-graph.md。
+今天做 P2 · T13（文字对齐）+ README，目标是把 README、首页、视频第一镜口径对齐。
+只改：README.md。
 不许改：src/ 下的页面结构和器官正文（A 线今天的活）、docs/plan/ 原件、未经我审核的医学表述。
 做完跑：npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
