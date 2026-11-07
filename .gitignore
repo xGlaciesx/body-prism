@@ -38,6 +38,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 变量名模板必须提交，真实值放 .env.local（永不提交）
+!.env.example
 
 # vercel
 .vercel
