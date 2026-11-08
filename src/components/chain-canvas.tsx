@@ -29,12 +29,14 @@ type ChainCanvasProps = {
   nodes: ImpactNode[];
   edges: ImpactEdge[];
   organId: string;
+  /** 模型走过的影响链：非空时只点亮 path 上的边，其余压暗。 */
+  path?: { from: string; to: string }[] | null;
 };
 
-export function ChainCanvas({ nodes, edges, organId }: ChainCanvasProps) {
+export function ChainCanvas({ nodes, edges, organId, path = null }: ChainCanvasProps) {
   const layout = layoutChain(nodes);
   const renderState = getChainRenderState(
-    { organId, path: null },
+    { organId, path },
     nodes,
     edges,
   );

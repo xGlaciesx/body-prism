@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChainCanvas } from "@/components/chain-canvas";
+import { ChainView } from "@/components/chain-view";
 import {
   impactEdges,
   impactNodes,
@@ -66,11 +66,12 @@ export default async function ChainPage({
         })}
       </nav>
 
-      <section aria-label="影响链图" className="mt-8">
-        <ChainCanvas
+      <section aria-label="提问与影响链图" className="mt-8">
+        <ChainView
+          key={slug}
           nodes={impactNodes}
           edges={impactEdges}
-          organId={`organ:${slug}`}
+          organSlug={slug}
         />
       </section>
 
