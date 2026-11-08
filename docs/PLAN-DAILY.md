@@ -2,7 +2,7 @@
 
 > 唯一执行计划是 `docs/plan/PLAN-V4-implementation.md`。这份文件是「今天该干哪张卡」的滚动版：D1–D7 两人的提示词块已全部预生成；每天收工后同步一次，只重写「明天及以后」，今天和以前的不动。
 
-**状态概览：** 第 2 天 / 7 · 已完成 4 / 15 张卡（T0、T1、T2、T4）· 剩余 5 天 · 截止日期 2026-11-12
+**状态概览：** 第 3 天 / 7 · 已完成 5 / 15 张卡（T0、T1、T2、T4、T5）· 剩余 4 天 · 截止日期 2026-11-12
 
 ## 更新记录
 
@@ -15,6 +15,8 @@
 | 2026-11-07 | AI（Cline） | D2 收工：T1 收尾（.env.example）、T4 三个纯函数+测试完成；T3 审核记录已生成（56 行、5 条中医边改 C），终审签字顺延 D3 | 女孩完成 A 线；T3 终审待张子昂本人签字 |
 | 2026-11-07 | AI（Cline） | 守恒检查：T0/T1/T2/T4 已完成，T3 终审顺延 D3，T5–T10/T12/T13 排 D3–D7，T11/T14 已砍 | 无卡片凭空消失 |
 | 2026-11-07 | AI（Cline） | D2 收工（张子昂视角）：T1 收尾 .env.example、T3 审核记录 56 行 + 中医等级统一 C 均由张子昂完成并同步主干；终审签字待本人顺延 D3 | 修正 .env.example 分工归属，确认男孩产出已上主干 |
+| 2026-11-08 | AI（Cline） | D3 收工：李若溪 T5（/chain 页面 + ChainCanvas SVG 画布）完成；张子昂 T3 终审签字 + T8 步骤 1–6 未完成，顺延 D4 | T5 build 通过、?organ=heart 能渲染；张子昂今日未同步 |
+| 2026-11-08 | AI（Cline） | 守恒检查：T0/T1/T2/T4/T5 已完成，T3 终审 + T6/T7/T8/T9/T10/T12/T13 排 D4–D7，T11/T14 已砍 | 无卡片凭空消失 |
 
 ---
 
@@ -133,7 +135,7 @@
 
 ## D3 · 2026-11-08（周日）
 
-**状态：** ⬜ 未开始
+**状态：** ⚠️ 部分完成 —— 李若溪 T5（/chain 页面 + ChainCanvas SVG 画布）已完成，?organ=heart 能渲染一条链、npm run build 通过；张子昂 T3 终审签字 + T8 步骤 1–6 未完成，顺延 D4
 
 ### 李若溪（A 线 · 工程）
 
@@ -217,7 +219,9 @@ T4 已定稿的接口（不要重写）：
 
 ```text
 今天做 P2 · T6、T7，目标是把证据面板和红旗拦截接上：每条边都能点开看「凭什么」，红旗节点先拦一道就医提示。
-只改：新建 src/components/evidence-panel.tsx、src/content/medical-disclaimer.ts、src/components/red-flag-gate.tsx；修改 src/components/chain-canvas.tsx。
+先读：src/components/chain-canvas.tsx（T5 已产出）—— 边的 <g role="button" tabIndex={0} onKeyDown> 里已留 T6 接入点（当前回车/空格是占位）；redFlag 节点已画红环。
+T4 已定稿接口（直接用，不要重写）：getChainRenderState(sel, nodes, edges)、layoutChain(nodes)、edgeDash(level)。
+只改：新建 src/components/evidence-panel.tsx、src/content/medical-disclaimer.ts、src/components/red-flag-gate.tsx；修改 src/components/chain-canvas.tsx（把边的点击/键盘接入证据面板、redFlag 节点点击先弹拦截层）。
 不许改：impact-graph.ts 数据、NOT_DIAGNOSIS_NOTICE 原文；不给诊断/药名/剂量；不装依赖。
 做完跑：npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
@@ -225,26 +229,29 @@ T4 已定稿的接口（不要重写）：
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T8（步骤 7–10，接 DeepSeek）
+- **任务卡：** P2 · T3（医学终审签字 · 收尾，顺延自 D3）、P2 · T8（AI 策展人接口，步骤 1–10）
 - **做三件事：**
-  1. ① 服务端接 DeepSeek（key 只从 `process.env` 读）
-  2. ② 用 Zod 校验模型输出（必须符合 schema）
-  3. ③ 解析失败回退 fallback，答案带 claim/source 引用
-- **完成标志：** 问一句能看到带引用的回答；越界问题（胸痛）先建议就医
+  1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
+  2. ② T8 步骤 1–6（顺延自 D3）：建 `src/app/api/curator/route.ts`（POST 接口骨架），取 organSlug + question → `getImpactSubgraph` 取子图 → 校验路径/来源 → 先 fallback 返回，不接模型
+  3. ③ T8 步骤 7–10：接 DeepSeek（key 只从 `process.env` 读）+ Zod 校验输出 + 解析失败回退 fallback，答案带 claim/source 引用
+- **完成标志：** T3 审核记录「医学终审 / 结论」两栏填齐并签字；`curl -X POST /api/curator` 返回符合 schema 的 JSON（含 `mode`/`path`/`notice`），问一句能看到带引用的回答，越界问题先建议就医
 - **收工命令：**
   ```bash
   npm run build
   curl -X POST http://localhost:3000/api/curator -H "Content-Type: application/json" -d '{"organSlug":"kidney","question":"肾不好为什么会气短"}'
   ```
-- **卡住先看：** P2 · T8、D01 §4（DeepSeek 配置）、P2 · T7（红旗约定）
+- **卡住先看：** P2 · T3、P2 · T8、P2 · T4、D05 §5（成本/token 预算）
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T8（步骤 7–10），目标是把 DeepSeek 接进 /api/curator：输出带引用，解析失败能回退。
-只改：src/app/api/curator/route.ts。
-不许改：前端、医学表述；key 只从 process.env 读、不打印、不进前端；输出必须用 zod 校验。
-做完跑：npm run build；curl POST 一次确认回答带引用。
+今天做 P2 · T8（步骤 1–10），目标是把 /api/curator 从骨架到接 DeepSeek 一次打通。
+（T3 医学终审是张子昂本人的活，不在这条提示词里；Cline 只做结构校验，不做医学结论。）
+先读：src/content/impact-graph.ts 已导出的 getImpactSubgraph(organId)、subgraphToPrompt(organId)。
+只改：新建 src/app/api/curator/route.ts。
+不许改：前端页面、src/content 医学表述；不要把 API key 写进代码或前端；key 只从 process.env 读、不打印、不进前端；模型输出必须用 zod 校验、解析失败回退 fallback。
+接口要点：organId = "organ:" + organSlug，调 getImpactSubgraph 取子图，校验路径/来源；步骤 1–6 先 fallback，步骤 7–10 接 DeepSeek 带 claim/source 引用。
+做完跑：npm run build；再 curl POST /api/curator 确认返回 JSON 结构、回答带引用。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
