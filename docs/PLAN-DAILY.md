@@ -2,7 +2,7 @@
 
 > 唯一执行计划是 `docs/plan/PLAN-V4-implementation.md`。这份文件是「今天该干哪张卡」的滚动版：D1–D7 两人的提示词块已全部预生成；每天收工后同步一次，只重写「明天及以后」，今天和以前的不动。
 
-**状态概览：** 第 3 天 / 7 · 已完成 9 / 15 张卡（T0、T1、T2、T4、T5、T6、T7、T8、T10）· 剩余 4 天 · 截止日期 2026-11-12
+**状态概览：** 第 5 天 / 7 · 已完成 9 / 15 张卡（T0、T1、T2、T4、T5、T6、T7、T8、T10）+ S1 AI 章节、README 文字对齐 · 剩余 2 天 · 截止日期 2026-11-12
 
 ## 更新记录
 
@@ -21,6 +21,8 @@
 | 2026-11-08 | AI（Cline） | D3 张子昂提前完成 T10（缓存 30min/200条 + 一行 JSON 日志 + 429 直降）；并修复 T8 埋的 bug：subgraphToPrompt 给模型看中文名、却要求返回英文 id，导致 path 校验恒失败，已改为 buildSubgraphText 输出「中文名(英文id)」 | 已配 key 实测 ai 路径通过、缓存命中 cacheHit:true |
 | 2026-11-09 | AI（Cline） | D4 收工（李若溪部分）：T6 证据面板 + T7 红旗拦截完成，T7 事务收口（route.ts 已改 import needUrgentHelp，红旗词表统一，不再用 urgentPatterns）；张子昂 T3 终审签字未完成，顺延 D5（T10 已由张子昂提前完成） | 李若溪提前完成周一任务，lint/test/build 全绿 |
 | 2026-11-09 | AI（Cline） | 守恒检查：T0/T1/T2/T4/T5/T6/T7/T8/T10 已完成，T3 终审 + T9/T12/T13 排 D4–D7，T11/T14 已砍 | 无卡片凭空消失 |
+| 2026-11-10 | AI（Cline） | D5 张子昂：S1 技术文档 AI 章节完成（图约束生成 + 逐边校验 + 缓存日志）；README 文字对齐（开头两句与首页副标题一致）；全库口径统一（C=传统理论/D=概念类比、11 器官）；T3 医学终审签字未完成，顺延 D6 | T13 的 README 部分提前完成，A 线首页首屏叙事仍待做 |
+| 2026-11-10 | AI（Cline） | 守恒检查：T0/T1/T2/T4/T5/T6/T7/T8/T10 已完成，T3 终审 + T9/T12/T13（首页首屏）排 D6–D7，T11/T14 已砍；S1 AI 章节已完成 | 无卡片凭空消失 |
 
 ---
 
@@ -261,7 +263,7 @@ T4 已定稿接口（直接用，不要重写）：getChainRenderState(sel, node
 
 ## D5 · 2026-11-10（周二）
 
-**状态：** ⬜ 未开始
+**状态：** ⚠️ 部分完成 —— 张子昂 S1 技术文档 AI 章节完成、README 文字对齐完成、全库口径统一（C=传统理论/D=概念类比、11 器官）；李若溪 T9 前端接入 AI 未开始（顺延）；张子昂 T3 医学终审签字未完成（顺延）
 
 ### 李若溪（A 线 · 工程）
 
@@ -323,51 +325,55 @@ T4 已定稿接口（直接用，不要重写）：getChainRenderState(sel, node
 
 ### 李若溪（A 线 · 工程）
 
-- **任务卡：** P2 · T13（首页首屏叙事）
+- **任务卡：** P2 · T9（前端接入 AI，顺延自 D5）、P2 · T13（首页首屏叙事）
 - **做三件事：**
-  1. ① 改 `src/app/page.tsx` 首屏（三段式 + 两按钮 + 免责小字）
-  2. ② 与 README、视频第一镜口径对齐
-  3. ③ 手机宽度不横向滚动
-- **完成标志：** 首页首屏三段式可读、手机一屏可见
+  1. ① T9：建 `src/components/curator-box.tsx` + `chain-view.tsx`，`chain-canvas.tsx` 接收 path 参数高亮对应边
+  2. ② T9：输入「肾不好为什么会气短」能看到回答 + 图上高亮链
+  3. ③ T13：改 `src/app/page.tsx` 首屏（三段式 + 两按钮 + 免责小字，与 README/视频第一镜口径一致）
+- **完成标志：** AI 回答在图上高亮链；首页首屏三段式可读、手机一屏可见
 - **收工命令：**
   ```powershell
   npm run test
   npm run build
   ```
-- **卡住先看：** P2 · T13、D07 §3
+- **卡住先看：** P2 · T9、P2 · T8、P2 · T13、D07 §3
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T13，目标是把首页首屏改写成三段式叙事：一句话定位 + 三镜入口 + 免责小字，与 README 和视频第一镜口径一致。
-只改：src/app/page.tsx。
-不许改：/chain 页面的医学内容、src/content 下器官正文、docs/plan/ 原件；不装依赖。
+今天做 P2 · T9 + T13，目标是把 AI 回答接到影响链页面（问一句图上亮起模型走过的路），并把首页首屏改写成三段式叙事。
+先读：src/app/api/curator/route.ts（T8 已定稿：POST /api/curator 返回 { mode: "ai"|"fallback", answer, path: { from, to }[], sourceIds, notice }，path 用节点 id 如 organ:kidney / fn:blood-pressure / man:dyspnea）、src/components/chain-canvas.tsx（props 为 { nodes, edges, organId }，已管理证据面板 + 红旗弹层）。
+只改：新建 src/components/curator-box.tsx、chain-view.tsx；修改 src/components/chain-canvas.tsx（新增可选 path prop 传给 getChainRenderState 做高亮）、src/app/chain/page.tsx、src/app/page.tsx。
+已定稿接口（不要重写）：getChainRenderState(sel, nodes, edges)，sel = { organId, path }。
+不许改：/api/curator 实现、impact-graph 数据、src/content 器官正文；key 不进前端；不用 dangerouslySetInnerHTML 渲染回答；不装依赖。
+T13 口径：一句话定位「同一具身体，三种读法」+ 三镜入口 + 免责小字，与 README 和视频第一镜一致。
 做完跑：npm run test；npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T13（文字对齐）+ README
+- **任务卡：** P2 · T3（医学终审签字 · 收尾，顺延自 D5）
 - **做三件事：**
-  1. ① T13：README 开头三段式压缩成两句，与首页副标题口径一致
-  2. ② README 补「AI 部分是怎么做的」一节
-  3. ③ 复核 `docs/medical-review-impact-graph.md` 终审签字已齐（T3 顺延项，D3 完成）
-- **完成标志：** README 首段与首页副标题口径一致；审核记录终审签字齐
+  1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
+  2. ② T3：对 2 条「建议复核」边给出最终结论（保留 / 补 caveat / 降级 / 删除）
+  3. ③ T3：在 `docs/medical-review-impact-graph.md` 填「医学终审 / 结论」两栏并签字
+- **完成标志：** T3 审核记录「医学终审 / 结论」两栏填齐并签字
 - **收工命令：**
   ```bash
-  npm run build
+  npm run test
   ```
-- **卡住先看：** P2 · T13、P2 · T3、S1（TECH-DOC）
+- **卡住先看：** P2 · T3、content-pack/REVIEW.md
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T13（文字对齐）+ README，目标是把 README、首页、视频第一镜口径对齐。
-只改：README.md。
-不许改：src/ 下的页面结构和器官正文（A 线今天的活）、docs/plan/ 原件、未经我审核的医学表述。
-做完跑：npm run build。
-做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
+今天做 P2 · T3 医学终审签字，目标是把 56 条边的最终审核结论落到 docs/medical-review-impact-graph.md。
+（这是张子昂本人的活：逐条签字、给 2 条「建议复核」边下结论。Cline 只协助整理，不做医学判断。）
+只改：docs/medical-review-impact-graph.md。
+不许改：src/content/ 医学表述、docs/plan/ 原件。
+做完跑：npm run test（确认校验仍绿）。
+做完停下来，把终审结论汇总告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ---
