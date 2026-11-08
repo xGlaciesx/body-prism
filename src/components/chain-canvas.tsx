@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { ImpactEdge, ImpactNode } from "@/content/impact-graph";
 import {
   edgeDash,
   getChainRenderState,
   layoutChain,
 } from "@/lib/chain";
+import { EvidencePanel } from "@/components/evidence-panel";
+import { RedFlagGate } from "@/components/red-flag-gate";
 
 const W = 960;
 const H = 560;
@@ -40,11 +43,34 @@ export function ChainCanvas({ nodes, edges, organId }: ChainCanvasProps) {
   const innerH = H - PAD * 2;
   const nameById = new Map(nodes.map((node) => [node.id, node.nameCn]));
 
+  // T6/T7：选中边 + 红旗弹层都在画布组件内管理状态，page.tsx 是 Server Component 不碰这些。
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  const [redFlagOpen, setRedFlagOpen] = useState(false);
+
+  const selectedEdge = edges.find((edge) => edge.id === selectedEdgeId) ?? null;
+  // 画布拿到的是 "organ:heart"，证据面板要用 slug 去 organs 里匹配 sources。
+  const organSlug = organId.startsWith("organ:")
+    ? organId.slice("organ:".length)
+    : organId;
+
+  // 证据面板和红旗弹层都按 Esc 关闭。
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setSelectedEdgeId(null);
+        setRedFlagOpen(false);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   // 同一起点的多条边会完全重合，这里按“该起点下第几条”给控制点递增偏移。
   const seenFrom = new Map<string, number>();
 
   return (
-    <svg
+    <>
+      <svg
       viewBox={`0 0 ${W} ${H}`}
       role="img"
       aria-label="影响链图：器官、功能与可能表现之间的关系"
@@ -108,7 +134,14 @@ export function ChainCanvas({ nodes, edges, organId }: ChainCanvasProps) {
 
         const style = edgeDash(edge.evidenceLevel);
         const active = renderState.edgeState[edge.id] === "active";
-        const color = active ? "var(--color-structure)" : "var(--color-line)";
+        // 选中态的边压过其它高亮：加粗 + 墨水色，让“这一段正在被解释”一眼可见。
+        const selected = edge.id === selectedEdgeId;
+        const color = selected
+          ? "var(--color-ink)"
+          : active
+            ? "var(--color-structure)"
+            : "var(--color-line)";
+        const strokeWidth = selected ? style.strokeWidth + 1.5 : style.strokeWidth;
         const fromName = nameById.get(edge.from) ?? edge.from;
         const toName = nameById.get(edge.to) ?? edge.to;
 
@@ -118,10 +151,13 @@ export function ChainCanvas({ nodes, edges, organId }: ChainCanvasProps) {
             role="button"
             tabIndex={0}
             aria-label={`从「${fromName}」到「${toName}」的关系`}
+            aria-pressed={selected}
+            className="cursor-pointer"
+            onClick={() => setSelectedEdgeId(edge.id)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                // T6 证据面板接入点：回车/空格应打开这条边的证据面板。
+                setSelectedEdgeId(edge.id);
               }
             }}
           >
@@ -137,7 +173,7 @@ export function ChainCanvas({ nodes, edges, organId }: ChainCanvasProps) {
             <path
               d={d}
               stroke={color}
-              strokeWidth={style.strokeWidth}
+              strokeWidth={strokeWidth}
               strokeDasharray={style.dash}
               opacity={style.opacity}
               fill="none"
@@ -195,8 +231,39 @@ export function ChainCanvas({ nodes, edges, organId }: ChainCanvasProps) {
             </a>
           );
         }
+
+        // 红旗表现：点击先弹就医提示层，不做跳转、也不打开证据面板（T7）。
+        if (node.kind === "manifestation" && node.redFlag) {
+          return (
+            <g
+              key={node.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`${node.nameCn}：点击查看就医提示`}
+              className="cursor-pointer"
+              onClick={() => setRedFlagOpen(true)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setRedFlagOpen(true);
+                }
+              }}
+            >
+              {body}
+            </g>
+          );
+        }
+
         return <g key={node.id}>{body}</g>;
       })}
-    </svg>
+      </svg>
+
+      <EvidencePanel
+        edge={selectedEdge}
+        organSlug={organSlug}
+        onClose={() => setSelectedEdgeId(null)}
+      />
+      <RedFlagGate open={redFlagOpen} onClose={() => setRedFlagOpen(false)} />
+    </>
   );
 }

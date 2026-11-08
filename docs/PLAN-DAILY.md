@@ -2,7 +2,7 @@
 
 > 唯一执行计划是 `docs/plan/PLAN-V4-implementation.md`。这份文件是「今天该干哪张卡」的滚动版：D1–D7 两人的提示词块已全部预生成；每天收工后同步一次，只重写「明天及以后」，今天和以前的不动。
 
-**状态概览：** 第 3 天 / 7 · 已完成 7 / 15 张卡（T0、T1、T2、T4、T5、T8、T10）· 剩余 4 天 · 截止日期 2026-11-12
+**状态概览：** 第 3 天 / 7 · 已完成 9 / 15 张卡（T0、T1、T2、T4、T5、T6、T7、T8、T10）· 剩余 4 天 · 截止日期 2026-11-12
 
 ## 更新记录
 
@@ -19,6 +19,8 @@
 | 2026-11-08 | AI（Cline） | 守恒检查：T0/T1/T2/T4/T5/T8/T10 已完成，T3 终审 + T6/T7/T9/T12/T13 排 D4–D7，T11/T14 已砍 | 无卡片凭空消失 |
 | 2026-11-08 | AI（Cline） | 事务记录：T8 的提问框红旗判断临时用 curator-fallback.ts 的 urgentPatterns（4 类）；红旗词表正式实现属 T7（red-flag-gate.tsx 的 needUrgentHelp + medical-disclaimer.ts 的 RED_FLAG_KEYWORDS），词表更全。T7 做完后 route.ts 要改 import needUrgentHelp 统一 | 避免 T7 产生第二套不一致的红旗词表 |
 | 2026-11-08 | AI（Cline） | D3 张子昂提前完成 T10（缓存 30min/200条 + 一行 JSON 日志 + 429 直降）；并修复 T8 埋的 bug：subgraphToPrompt 给模型看中文名、却要求返回英文 id，导致 path 校验恒失败，已改为 buildSubgraphText 输出「中文名(英文id)」 | 已配 key 实测 ai 路径通过、缓存命中 cacheHit:true |
+| 2026-11-09 | AI（Cline） | D4 收工（李若溪部分）：T6 证据面板 + T7 红旗拦截完成，T7 事务收口（route.ts 已改 import needUrgentHelp，红旗词表统一，不再用 urgentPatterns）；张子昂 T3 终审签字未完成，顺延 D5（T10 已由张子昂提前完成） | 李若溪提前完成周一任务，lint/test/build 全绿 |
+| 2026-11-09 | AI（Cline） | 守恒检查：T0/T1/T2/T4/T5/T6/T7/T8/T10 已完成，T3 终审 + T9/T12/T13 排 D4–D7，T11/T14 已砍 | 无卡片凭空消失 |
 
 ---
 
@@ -201,7 +203,7 @@ T4 已定稿的接口（不要重写）：
 
 ## D4 · 2026-11-09（周一）
 
-**状态：** ⬜ 未开始
+**状态：** ⚠️ 部分完成 —— 李若溪 T6（证据面板）+ T7（红旗拦截 + 红旗词表统一）已完成并提前收工；张子昂 T10（缓存/日志）已提前完成、T3 终审签字未完成，顺延 D5
 
 ### 李若溪（A 线 · 工程）
 
@@ -279,33 +281,37 @@ T4 已定稿接口（直接用，不要重写）：getChainRenderState(sel, node
 
 ```text
 今天做 P2 · T9，目标是把 AI 回答接到影响链页面：问一句，图上把模型走过的路亮起来。
+先读：src/app/api/curator/route.ts（T8 已定稿：POST /api/curator 返回 { mode: "ai"|"fallback", answer, path: { from, to }[], sourceIds, notice }，path 用节点 id 如 organ:kidney / fn:blood-pressure / man:dyspnea）、src/components/chain-canvas.tsx（T5–T7 已产出：props 为 { nodes, edges, organId }，内部已管理证据面板 + 红旗弹层）。
 只改：新建 src/components/curator-box.tsx、chain-view.tsx；修改 src/components/chain-canvas.tsx、src/app/chain/page.tsx。
-不许改：/api/curator 的实现；不要把 key 用进前端；不要用 dangerouslySetInnerHTML 渲染回答；不装依赖。
+已定稿接口（不要重写）：getChainRenderState(sel, nodes, edges)，sel = { organId, path }（path: { from, to }[] | null）；ChainCanvas 需新增可选 path prop 传给 getChainRenderState 做高亮。
+不许改：/api/curator 的实现、impact-graph 数据；key 不进前端；不用 dangerouslySetInnerHTML 渲染回答；不装依赖。
 做完跑：npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** S1（技术文档初稿 · AI 章节）
+- **任务卡：** P2 · T3（医学终审签字 · 收尾，顺延自 D4）、S1（技术文档初稿 · AI 章节）
 - **做三件事：**
-  1. ① 写技术文档「AI 部分怎么做」一节：图约束生成（getImpactSubgraph/subgraphToPrompt）+ 逐边校验（verifyPath/verifySourceIds）+ 降级（fallback）
-  2. ② 说明红旗判断留在本地规则层、模型不参与红旗判定
-  3. ③ 记录系统提示词约束（不判断患病、不给诊断/药物/剂量、path 逐字取自节点 id）
-- **完成标志：** 技术文档 AI 章节初稿可读，讲清「地图+画路径+逐边校验」三层
+  1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
+  2. ② S1：写技术文档「AI 部分怎么做」一节（图约束生成 + 逐边校验 + 降级）
+  3. ③ S1：说明红旗判断留在本地规则层、模型不参与红旗判定，并记录系统提示词约束（不判断患病、不给诊断/药物/剂量、path 逐字取自节点 id）
+- **完成标志：** T3 审核记录签字齐；技术文档 AI 章节初稿可读
 - **收工命令：**
   ```bash
-  （无代码命令，产出文档）
+  npm run build
   ```
-- **卡住先看：** S1（TECH-DOC）、P2 · T8（已实现，对照写）
+- **卡住先看：** P2 · T3、P2 · T8、S1（TECH-DOC）
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 S1 技术文档的 AI 章节初稿，目标是把 /api/curator 的设计讲清楚。
-只改：docs/ 下技术文档相关文件（或按 S1 模板指定的路径）。
+今天做 S1 技术文档 AI 章节，目标是把 /api/curator 的设计讲清楚。
+（T3 医学终审是张子昂本人的活，不在这条提示词里；Cline 只做文档，不做医学结论。）
+先读：src/app/api/curator/route.ts（T8+T10 已定稿：含缓存/日志，红旗判断已统一用 needUrgentHelp，来自 src/components/red-flag-gate.tsx）。
+只改：docs/ 下技术文档相关文件（S1）。
 不许改：功能代码、医学表述、docs/plan/ 原件。
-依据（T8 已实现，照着写，别编）：图约束生成（只给模型子图）、逐边校验（path 连续链 + sourceIds 并集）、红旗本地判定（urgentPatterns）、失败降级 fallback。
+依据（照实写，别编）：图约束生成（getImpactSubgraph/buildSubgraphText）、逐边校验（verifyPath/verifySourceIds）、红旗本地判定（needUrgentHelp，模型不参与）、失败降级 fallback、缓存与日志（cacheKey/cacheGet/cacheSet/logCurator）。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
