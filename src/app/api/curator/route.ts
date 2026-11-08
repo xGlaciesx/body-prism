@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+import { needUrgentHelp } from "@/components/red-flag-gate";
 import {
   NOT_DIAGNOSIS_NOTICE,
   getImpactSubgraph,
@@ -8,7 +9,7 @@ import {
   type ImpactEdge,
 } from "@/content/impact-graph";
 import { organBySlug } from "@/content/organs";
-import { pickFallback, urgentPatterns } from "@/lib/curator-fallback";
+import { pickFallback } from "@/lib/curator-fallback";
 
 /**
  * 请求体 schema：所有外部输入都要校验，脏数据不能进入取子图逻辑。
@@ -22,6 +23,11 @@ const CuratorRequestSchema = z.object({
 /** 兜底回答的通用占位：既不诊断也不给建议，只引导去看影响链。 */
 const DEFAULT_ANSWER =
   "这个问题可以到对应器官的「影响链」页面查看：每一段都能点开，看机制、证据强度和来源。";
+
+/** 红旗命中的固定回答：只引导就医，不解释任何医学细节。 */
+const RED_FLAG_ANSWER =
+  "你输入的内容可能涉及需要尽快处理的急症表现。本网站只做科普、不能判断你的情况；" +
+  "如果它正在发生或明显加重，请立即就医，紧急情况请拨打 120。";
 
 /**
  * 系统提示词：让模型只能沿着给定子图作答。
@@ -71,16 +77,14 @@ export async function POST(req: NextRequest) {
 
   // 红旗词命中：不回答医学细节，只引导就医。
   // 判断必须留在本地规则层，不能交给模型——模型一旦参与，就没有「一定安全」的保证。
-  const lower = question.toLowerCase();
-  for (const pattern of urgentPatterns) {
-    if (pattern.keywords.some((k) => lower.includes(k.toLowerCase()))) {
-      return respond({
-        mode: "fallback",
-        answer: pattern.message,
-        path: [],
-        sourceIds: [],
-      });
-    }
+  // 统一用 T7 的 needUrgentHelp（RED_FLAG_KEYWORDS），不再维护两套词表。
+  if (needUrgentHelp(question)) {
+    return respond({
+      mode: "fallback",
+      answer: RED_FLAG_ANSWER,
+      path: [],
+      sourceIds: [],
+    });
   }
 
   // 取该器官的一阶子图：接模型后用于生成提示词，也给 fallback 提供真实边。
