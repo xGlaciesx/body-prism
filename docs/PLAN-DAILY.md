@@ -15,6 +15,8 @@
 | 2026-11-07 | AI（Cline） | D2 收工：T1 收尾（.env.example）、T4 三个纯函数+测试完成；T3 审核记录已生成（56 行、5 条中医边改 C），终审签字顺延 D3 | 女孩完成 A 线；T3 终审待张子昂本人签字 |
 | 2026-11-07 | AI（Cline） | 守恒检查：T0/T1/T2/T4 已完成，T3 终审顺延 D3，T5–T10/T12/T13 排 D3–D7，T11/T14 已砍 | 无卡片凭空消失 |
 | 2026-11-07 | AI（Cline） | D2 收工（张子昂视角）：T1 收尾 .env.example、T3 审核记录 56 行 + 中医等级统一 C 均由张子昂完成并同步主干；终审签字待本人顺延 D3 | 修正 .env.example 分工归属，确认男孩产出已上主干 |
+| 2026-11-08 | AI（Cline） | D3 张子昂：T8 步骤 1–10 全部完成（含接 DeepSeek + 校验降级），已推 feat/d3-张子昂 分支；T3 终审签字仍待本人 | T8 一次做完 1–10，不用拆到 D4 |
+| 2026-11-08 | AI（Cline） | 事务记录：T8 的提问框红旗判断临时用 curator-fallback.ts 的 urgentPatterns（4 类）；红旗词表正式实现属 T7（red-flag-gate.tsx 的 needUrgentHelp + medical-disclaimer.ts 的 RED_FLAG_KEYWORDS），词表更全。T7 做完后 route.ts 要改 import needUrgentHelp 统一 | 避免 T7 产生第二套不一致的红旗词表 |
 
 ---
 
@@ -167,12 +169,12 @@ T4 已定稿的接口（不要重写）：
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T3（医学终审签字 · 收尾）、P2 · T8（AI 策展人接口，步骤 1–6，先不接模型）
+- **任务卡：** P2 · T3（医学终审签字 · 收尾）、P2 · T8（AI 策展人接口，步骤 1–10）
 - **做三件事：**
   1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
-  2. ② T8：建 `src/app/api/curator/route.ts`（POST 接口骨架），取 `organSlug` + `question` → `getImpactSubgraph` 取子图 → 校验路径/来源
-  3. ③ T8：不接 DeepSeek，先用 fallback 返回，确认响应结构对
-- **完成标志：** T3 审核记录「医学终审 / 结论」两栏填齐并签字；`curl -X POST /api/curator` 返回符合 schema 的 JSON（含 `mode`/`path`/`notice`），且不调模型
+  2. ② T8：建 `src/app/api/curator/route.ts`（POST 接口）：zod 校验 → 红旗判断 → 取子图 → 接 DeepSeek → 校验 path/sourceIds → fallback
+  3. ③ T8：`npm run build` + curl 验证降级路径（无 key 走 fallback，红旗词走就医引导，非法器官 400）
+- **完成标志：** T3 审核记录「医学终审 / 结论」两栏填齐并签字；`curl -X POST /api/curator` 返回 `{ mode, answer, path, sourceIds, notice }`，红旗词不调模型、无 key 走 fallback
 - **收工命令：**
   ```bash
   npm run build
@@ -219,32 +221,32 @@ T4 已定稿的接口（不要重写）：
 今天做 P2 · T6、T7，目标是把证据面板和红旗拦截接上：每条边都能点开看「凭什么」，红旗节点先拦一道就医提示。
 只改：新建 src/components/evidence-panel.tsx、src/content/medical-disclaimer.ts、src/components/red-flag-gate.tsx；修改 src/components/chain-canvas.tsx。
 不许改：impact-graph.ts 数据、NOT_DIAGNOSIS_NOTICE 原文；不给诊断/药名/剂量；不装依赖。
+【红旗词表事务（重要）】T8 已经在 src/app/api/curator/route.ts 里用 curator-fallback.ts 的 urgentPatterns（4 类）做了提问框红旗判断。你这份 T7 的 RED_FLAG_KEYWORDS（含剧烈头痛、突然说不出话、止不住血等，更全）是红旗词表的正式实现；做完后需要：① needUrgentHelp 用 RED_FLAG_KEYWORDS 判定；② 把 route.ts 里的 urgentPatterns 判断改成 import needUrgentHelp，统一词表，别留两套。
 做完跑：npm run build。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T8（步骤 7–10，接 DeepSeek）
+- **任务卡：** P2 · T10（降级、缓存与日志）
 - **做三件事：**
-  1. ① 服务端接 DeepSeek（key 只从 `process.env` 读）
-  2. ② 用 Zod 校验模型输出（必须符合 schema）
-  3. ③ 解析失败回退 fallback，答案带 claim/source 引用
-- **完成标志：** 问一句能看到带引用的回答；越界问题（胸痛）先建议就医
+  1. ① route.ts 加内存缓存（30 分钟，size > 200 淘汰最旧）
+  2. ② 加日志（一行 JSON，不打印 question 原文 / key / 模型原始输出）
+  3. ③ 超时 8 秒不重试；HTTP 429 直接 fallback
+- **完成标志：** 断网/删 key 仍能演示（fallback）；连问两次第二次明显更快（缓存命中）
 - **收工命令：**
   ```bash
   npm run build
-  curl -X POST http://localhost:3000/api/curator -H "Content-Type: application/json" -d '{"organSlug":"kidney","question":"肾不好为什么会气短"}'
   ```
-- **卡住先看：** P2 · T8、D01 §4（DeepSeek 配置）、P2 · T7（红旗约定）
+- **卡住先看：** P2 · T10、D05 §5、P2 · T8
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T8（步骤 7–10），目标是把 DeepSeek 接进 /api/curator：输出带引用，解析失败能回退。
+今天做 P2 · T10，目标是把 /api/curator 加上缓存和日志，让断网/超时/限流都不白屏。
 只改：src/app/api/curator/route.ts。
-不许改：前端、医学表述；key 只从 process.env 读、不打印、不进前端；输出必须用 zod 校验。
-做完跑：npm run build；curl POST 一次确认回答带引用。
+不许改：返回结构；不引入数据库、不装依赖；日志不打印 question 原文和 key。
+做完跑：npm run build；curl 连发两次确认第二次命中缓存。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
@@ -280,25 +282,25 @@ T4 已定稿的接口（不要重写）：
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T10（降级、缓存与日志）
+- **任务卡：** S1（技术文档初稿 · AI 章节）
 - **做三件事：**
-  1. ① route.ts 加内存缓存（30 分钟，size > 200 淘汰最旧）
-  2. ② 加日志（一行 JSON，不打印 question 原文 / key / 模型原始输出）
-  3. ③ 超时 8 秒不重试；HTTP 429 直接 fallback
-- **完成标志：** 断网/删 key 仍能演示（fallback）；连问两次第二次明显更快（缓存命中）
+  1. ① 写技术文档「AI 部分怎么做」一节：图约束生成（getImpactSubgraph/subgraphToPrompt）+ 逐边校验（verifyPath/verifySourceIds）+ 降级（fallback）
+  2. ② 说明红旗判断留在本地规则层、模型不参与红旗判定
+  3. ③ 记录系统提示词约束（不判断患病、不给诊断/药物/剂量、path 逐字取自节点 id）
+- **完成标志：** 技术文档 AI 章节初稿可读，讲清「地图+画路径+逐边校验」三层
 - **收工命令：**
   ```bash
-  npm run build
+  （无代码命令，产出文档）
   ```
-- **卡住先看：** P2 · T10、D05 §5、P2 · T8
+- **卡住先看：** S1（TECH-DOC）、P2 · T8（已实现，对照写）
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T10，目标是把 /api/curator 加上缓存和日志，让断网/超时/限流都不白屏。
-只改：src/app/api/curator/route.ts。
-不许改：返回结构；不引入数据库、不装依赖；日志不打印 question 原文和 key。
-做完跑：npm run build；curl 连发两次确认第二次命中缓存。
+今天做 S1 技术文档的 AI 章节初稿，目标是把 /api/curator 的设计讲清楚。
+只改：docs/ 下技术文档相关文件（或按 S1 模板指定的路径）。
+不许改：功能代码、医学表述、docs/plan/ 原件。
+依据（T8 已实现，照着写，别编）：图约束生成（只给模型子图）、逐边校验（path 连续链 + sourceIds 并集）、红旗本地判定（urgentPatterns）、失败降级 fallback。
 做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
 ```
 
