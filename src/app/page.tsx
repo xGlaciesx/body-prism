@@ -32,17 +32,51 @@ const lenses: Lens[] = [
 export default function Home() {
   return (
     <main>
-      <section className="mx-auto flex w-full max-w-5xl flex-col items-center px-6 pb-12 pt-20 text-center sm:pb-16 sm:pt-28">
-        <p className="text-sm font-medium tracking-widest text-muted">
-          2026 传智杯 · AI WEB
-        </p>
-        <h1 className="mt-6 font-serif text-5xl font-bold leading-tight sm:text-6xl md:text-7xl">
-          人体棱镜
-        </h1>
-        <p className="mt-6 text-xl sm:text-2xl">同一具身体，三种读法</p>
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-muted">
-          把结构、关系与信息放在同一具身体上对照阅读，每一条说法都标上它有多可信。
-        </p>
+      <section className="mx-auto w-full max-w-5xl px-6 pb-16 pt-16 sm:pb-20 sm:pt-24">
+        <div className="grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <p className="text-sm font-medium tracking-widest text-muted">
+              2026 传智杯 · AI WEB
+            </p>
+            <h1 className="mt-6 font-serif text-5xl font-bold leading-tight sm:text-6xl">
+              人体棱镜
+              <span className="mt-3 block font-sans text-xl font-normal tracking-wide text-muted sm:text-2xl">
+                Body Prism
+              </span>
+            </h1>
+            <p className="mt-6 text-xl leading-relaxed sm:text-2xl">
+              通用大模型告诉你「可能是什么」，我们说清「凭什么」。
+            </p>
+
+            <ol className="mt-8 list-decimal space-y-3 pl-5 text-base leading-relaxed text-ink/90">
+              <li>身体不舒服时，越来越多人不再搜索，而是直接问 AI。</li>
+              <li>但 AI 给的是一个结论——它不说这一步从哪来，也无从核对。</li>
+              <li>人体棱镜把每条身体结论的推理链摊开：每一步都能点开，都标着证据强度。</li>
+            </ol>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/chain?organ=kidney"
+                className="rounded-full bg-structure px-6 py-3 text-sm font-medium text-white transition-colors hover:opacity-90"
+              >
+                看一条链
+              </Link>
+              <Link
+                href="/method"
+                className="rounded-full border border-line px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-structure"
+              >
+                它凭什么这么说
+              </Link>
+            </div>
+
+            <p className="mt-8 text-xs text-muted">
+              本站为科普作品，不提供诊断或治疗建议。急症请拨打 120。
+            </p>
+          </div>
+
+          {/* 右侧留空：T14 的三维入口放这里，先占住 5 栏栅格避免返工。 */}
+          <div className="lg:col-span-5" aria-hidden="true" />
+        </div>
       </section>
 
       <section
