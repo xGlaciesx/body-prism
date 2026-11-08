@@ -34,7 +34,7 @@ npm ci
 npm run dev
 ```
 
-打开 http://localhost:3000。常用命令：`npm run lint`、`npm run build`。
+打开 http://localhost:3000。常用命令：`npm run lint`、`npm run test`、`npm run build`；起服务后可跑冒烟测试 `bash scripts/smoke.sh http://localhost:3000`（会依次打 6 个器官的影响链页和 AI 接口，全部 200 才通过）。
 
 ## 目录结构
 
