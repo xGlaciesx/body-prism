@@ -2,7 +2,7 @@
 
 > 唯一执行计划是 `docs/plan/PLAN-V4-implementation.md`。这份文件是「今天该干哪张卡」的滚动版：D1–D7 两人的提示词块已全部预生成；每天收工后同步一次，只重写「明天及以后」，今天和以前的不动。
 
-**状态概览：** 第 3 天 / 7 · 已完成 6 / 15 张卡（T0、T1、T2、T4、T5、T8）· 剩余 4 天 · 截止日期 2026-11-12
+**状态概览：** 第 3 天 / 7 · 已完成 7 / 15 张卡（T0、T1、T2、T4、T5、T8、T10）· 剩余 4 天 · 截止日期 2026-11-12
 
 ## 更新记录
 
@@ -16,8 +16,9 @@
 | 2026-11-07 | AI（Cline） | 守恒检查：T0/T1/T2/T4 已完成，T3 终审顺延 D3，T5–T10/T12/T13 排 D3–D7，T11/T14 已砍 | 无卡片凭空消失 |
 | 2026-11-07 | AI（Cline） | D2 收工（张子昂视角）：T1 收尾 .env.example、T3 审核记录 56 行 + 中医等级统一 C 均由张子昂完成并同步主干；终审签字待本人顺延 D3 | 修正 .env.example 分工归属，确认男孩产出已上主干 |
 | 2026-11-08 | AI（Cline） | D3 收工：李若溪 T5（/chain 页面 + ChainCanvas SVG 画布）完成；张子昂 T8 步骤 1–10 全部完成（含接 DeepSeek + 校验降级）；T3 终审签字未完成，顺延 D4 | T5 build 通过、?organ=heart 能渲染；T8 已推 feat/d3-张子昂 分支 |
-| 2026-11-08 | AI（Cline） | 守恒检查：T0/T1/T2/T4/T5/T8 已完成，T3 终审 + T6/T7/T9/T10/T12/T13 排 D4–D7，T11/T14 已砍 | 无卡片凭空消失 |
+| 2026-11-08 | AI（Cline） | 守恒检查：T0/T1/T2/T4/T5/T8/T10 已完成，T3 终审 + T6/T7/T9/T12/T13 排 D4–D7，T11/T14 已砍 | 无卡片凭空消失 |
 | 2026-11-08 | AI（Cline） | 事务记录：T8 的提问框红旗判断临时用 curator-fallback.ts 的 urgentPatterns（4 类）；红旗词表正式实现属 T7（red-flag-gate.tsx 的 needUrgentHelp + medical-disclaimer.ts 的 RED_FLAG_KEYWORDS），词表更全。T7 做完后 route.ts 要改 import needUrgentHelp 统一 | 避免 T7 产生第二套不一致的红旗词表 |
+| 2026-11-08 | AI（Cline） | D3 张子昂提前完成 T10（缓存 30min/200条 + 一行 JSON 日志 + 429 直降）；并修复 T8 埋的 bug：subgraphToPrompt 给模型看中文名、却要求返回英文 id，导致 path 校验恒失败，已改为 buildSubgraphText 输出「中文名(英文id)」 | 已配 key 实测 ai 路径通过、缓存命中 cacheHit:true |
 
 ---
 
@@ -231,27 +232,27 @@ T4 已定稿接口（直接用，不要重写）：getChainRenderState(sel, node
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T3（医学终审签字 · 收尾，顺延自 D3）、P2 · T10（降级、缓存与日志）
+- **任务卡：** P2 · T3（医学终审签字 · 收尾，顺延自 D3）
 - **做三件事：**
   1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
-  2. ② T10：route.ts 加内存缓存（30 分钟，size > 200 淘汰最旧）+ 日志（不打印 question 原文 / key / 模型原始输出）
-  3. ③ T10：超时 8 秒不重试；HTTP 429 直接 fallback
-- **完成标志：** T3 审核记录签字齐；断网/删 key 仍能演示（fallback）；连问两次第二次命中缓存
+  2. ② T3：对 2 条「建议复核」边给出最终结论（保留 / 补 caveat / 降级 / 删除）
+  3. ③ T3：在 `docs/medical-review-impact-graph.md` 填「医学终审 / 结论」两栏并签字
+- **完成标志：** T3 审核记录「医学终审 / 结论」两栏填齐并签字
 - **收工命令：**
   ```bash
-  npm run build
+  npm run test
   ```
-- **卡住先看：** P2 · T3、P2 · T10、D05 §5、P2 · T8
+- **卡住先看：** P2 · T3、content-pack/REVIEW.md
 
 **提示词块（整块复制给 Cline）：**
 
 ```text
-今天做 P2 · T10，目标是把 /api/curator 加上缓存和日志，让断网/超时/限流都不白屏。
-（T3 医学终审是张子昂本人的活，不在这条提示词里；Cline 只做缓存/日志，不做医学结论。）
-只改：src/app/api/curator/route.ts。
-不许改：返回结构；不引入数据库、不装依赖；日志不打印 question 原文和 key。
-做完跑：npm run build；curl 连发两次确认第二次命中缓存。
-做完停下来，把改了哪些文件告诉我，不要更新 PLAN-DAILY.md
+今天做 P2 · T3 医学终审签字，目标是把 56 条边的最终审核结论落到 docs/medical-review-impact-graph.md。
+（这是张子昂本人的活：逐条签字、给 2 条「建议复核」边下结论。Cline 只协助整理，不做医学判断。）
+只改：docs/medical-review-impact-graph.md。
+不许改：src/content/ 医学表述、docs/plan/ 原件。
+做完跑：npm run test（确认校验仍绿）。
+做完停下来，把终审结论汇总告诉我，不要更新 PLAN-DAILY.md
 ```
 
 ---
