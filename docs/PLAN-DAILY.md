@@ -30,7 +30,7 @@
 
 ### 李若溪（A 线 · 工程）
 
-- **任务卡：** P2 · T0（环境自检）、P2 · T1（仓库护栏）
+- **任务卡：** ✅ P2 · T0（环境自检）、✅ P2 · T1（仓库护栏）
 - **做三件事：**
   1. ① `node -v`（确认 ≥ 20）→ `npm ci` → `npm run dev`，本地首页能打开
   2. ② 建/更新根目录护栏：`.clinerules`、`.env.example`、`ATTRIBUTION.md`、`LICENSE`
@@ -55,7 +55,7 @@
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T0、T1、T2（内容完整性校验 + 测试框架）
+- **任务卡：** ✅ P2 · T0、✅ P2 · T1、✅ P2 · T2（内容完整性校验 + 测试框架）
 - **做三件事：**
   1. ① macOS 上 `node -v` → `npm ci` → `npm run dev` 跑通
   2. ② 复核 `.clinerules` 与免责声明文案，确认无诊断/剂量表述
@@ -86,7 +86,7 @@
 
 ### 李若溪（A 线 · 工程）
 
-- **任务卡：** P2 · T1 收尾（.env.example）、P2 · T4（影响链的三个纯函数）
+- **任务卡：** ✅ P2 · T1 收尾（.env.example）、✅ P2 · T4（影响链的三个纯函数）
 - **做三件事：**
   1. ① 补根目录 `.env.example`（只写 `DEEPSEEK_API_KEY=`，不填真值）
   2. ② 建 `src/lib/chain.ts`：`getSubgraph(organSlug)`、`getChainPaths(from,to)`、`getChainRenderState(organSlug)`
@@ -143,7 +143,7 @@
 
 ### 李若溪（A 线 · 工程）
 
-- **任务卡：** P2 · T5（`/chain` 页面骨架）
+- **任务卡：** ✅ P2 · T5（`/chain` 页面骨架）
 - **做三件事：**
   1. ① 建 `src/app/chain/page.tsx`（Server Component，取 organ + 数据）
   2. ② 建 `src/components/chain-canvas.tsx`（"use client"，用 `getChainRenderState` + `layoutChain` + `edgeDash` 画节点+边）
@@ -173,7 +173,7 @@ T4 已定稿的接口（不要重写）：
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T3（医学终审签字 · 收尾）、P2 · T8（AI 策展人接口，步骤 1–10）
+- **任务卡：** P2 · T3（医学终审签字 · 收尾）、✅ P2 · T8（AI 策展人接口，步骤 1–10）
 - **做三件事：**
   1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
   2. ② T8：建 `src/app/api/curator/route.ts`（POST 接口）：zod 校验 → 红旗判断 → 取子图 → 接 DeepSeek → 校验 path/sourceIds → fallback
@@ -207,7 +207,7 @@ T4 已定稿的接口（不要重写）：
 
 ### 李若溪（A 线 · 工程）
 
-- **任务卡：** P2 · T6（证据面板）、P2 · T7（红旗拦截）
+- **任务卡：** ✅ P2 · T6（证据面板）、✅ P2 · T7（红旗拦截）
 - **做三件事：**
   1. ① T6：建 `src/components/evidence-panel.tsx`，`chain-canvas.tsx` 支持点击边
   2. ② T7：建 `src/content/medical-disclaimer.ts` + `src/components/red-flag-gate.tsx`
@@ -291,7 +291,7 @@ T4 已定稿接口（直接用，不要重写）：getChainRenderState(sel, node
 
 ### 张子昂（B 线 · 内容）
 
-- **任务卡：** P2 · T3（医学终审签字 · 收尾，顺延自 D4）、S1（技术文档初稿 · AI 章节）
+- **任务卡：** P2 · T3（医学终审签字 · 收尾，顺延自 D4）、✅ S1（技术文档初稿 · AI 章节）
 - **做三件事：**
   1. ① T3：本人逐条终审 56 条边并签字（重点 2 条「建议复核」边 E-ALB-ASCITES、E-KID-NOCTURIA）
   2. ② S1：写技术文档「AI 部分怎么做」一节（图约束生成 + 逐边校验 + 降级）
