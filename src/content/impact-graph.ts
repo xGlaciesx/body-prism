@@ -173,7 +173,8 @@ export const impactEdges: ImpactEdge[] = [
     mechanism: "肾脏浓缩尿液的能力下降时，夜间尿量可相对增多。",
     evidenceLevel: "A",
     sourceIds: ["SRC-KIDNEY-002"],
-    caveat: CAVEAT_INDIVIDUAL,
+    caveat:
+      "夜尿也常见于前列腺、膀胱、饮水、利尿剂、睡眠等；存在个体差异。",
   },
   {
     id: "E-KID-FATIGUE",
@@ -339,7 +340,8 @@ export const impactEdges: ImpactEdge[] = [
     mechanism: "白蛋白偏低时血管内胶体渗透压下降，液体可向腹腔等组织间隙移动。",
     evidenceLevel: "A",
     sourceIds: ["SRC-LIVER-002"],
-    caveat: "腹水的原因还包括心源性、肾源性与肿瘤等，不能自行归因。",
+    caveat:
+      "腹水的原因还包括心源性、肾源性与肿瘤等，不能自行归因。肝硬化腹水以门脉高压为主因，白蛋白低为次要因素。",
   },
   {
     id: "E-LIVER-BILI",
