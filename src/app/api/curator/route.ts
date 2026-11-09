@@ -42,6 +42,49 @@ const CACHE_TTL_MS = 30 * 60 * 1000;
 /** 缓存上限：超过 200 条就淘汰最旧的一条。 */
 const CACHE_MAX_SIZE = 200;
 
+/**
+ * 限流：同一来源 60 秒内最多 12 次。
+ *
+ * 为什么必须做：这个接口一旦公网可访问，就是一台挂着 API Key 的取款机。
+ * 一个循环脚本能在几分钟内把额度刷光，演示当天就没人能问出真答案了。
+ *
+ * 已知局限（如实写在这里，不假装它是分布式限流）：计数存在进程内存里，
+ * Vercel 多实例部署时每个实例各算各的。它挡得住脚本，挡不住精心设计的分布式刷。
+ * 真要挡那个，得上边缘限流或 WAF——以目前的规模不值得，但边界要写清楚。
+ */
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX_HITS = 12;
+const rateBuckets = new Map<string, number[]>();
+
+/** 取请求来源：Vercel 会在 x-forwarded-for 里放真实 IP，取第一个。 */
+function clientId(req: NextRequest): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return req.headers.get("x-real-ip") ?? "unknown";
+}
+
+/** 记一次并判断是否超限；顺带清掉过期的桶，避免 Map 无限长。 */
+function isRateLimited(id: string): boolean {
+  const now = Date.now();
+  const cutoff = now - RATE_WINDOW_MS;
+
+  for (const [key, times] of rateBuckets) {
+    if (times.every((t) => t < cutoff)) rateBuckets.delete(key);
+  }
+
+  const recent = (rateBuckets.get(id) ?? []).filter((t) => t >= cutoff);
+  if (recent.length >= RATE_MAX_HITS) {
+    rateBuckets.set(id, recent);
+    return true;
+  }
+  recent.push(now);
+  rateBuckets.set(id, recent);
+  return false;
+}
+
 /** 内存缓存：key 是 organSlug + question 的散列，不存提问原文。 */
 const cache = new Map<
   string,
@@ -175,6 +218,16 @@ export async function POST(req: NextRequest) {
       path: [],
       sourceIds: [],
     });
+  }
+
+  // 限流放在红旗拦截**之后**：涉及急症的提问必须永远能拿到「请就医」，
+  // 不能因为这个人刚才问得太多就把安全提示也一起挡掉。
+  if (isRateLimited(clientId(req))) {
+    logCurator(organSlug, "rate_limited", false, Date.now() - started);
+    return NextResponse.json(
+      { error: "请求太频繁，请稍后再试。" },
+      { status: 429, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   // 取该器官的一阶子图：接模型后用于生成提示词，也给 fallback 提供真实边。
@@ -331,7 +384,9 @@ async function callDeepSeek(
   organSlug: string,
 ): Promise<unknown> {
   const subgraph = getImpactSubgraph(`organ:${organSlug}`);
-  const resp = await fetch("https://api.deepseek.com/chat/completions", {
+  // .env.example 里承诺了这个变量，就得真的用上——否则它是一行骗人的配置。
+  const baseUrl = (process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com").replace(/\/+$/, "");
+  const resp = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -424,6 +479,10 @@ function buildFallbackPayload(
 
 /**
  * 写缓存 + 记日志 + 响应，把三条路径（无 key / 模型异常 / 校验失败）收敛到一处。
+ *
+ * **只缓存 mode === "ai" 的结果。** 降级答案如果也缓存 30 分钟，
+ * 那么模型只是抖了一下（一次超时、一次 429），这个问题在半小时内
+ * 就再也问不出真答案了——用户看到的是「兜底」，而我们以为是自己主动降级。
  */
 function respondAndCache(
   key: string,
@@ -432,7 +491,7 @@ function respondAndCache(
   started: number,
   reason?: string,
 ) {
-  cacheSet(key, payload);
+  if (payload.mode === "ai") cacheSet(key, payload);
   logCurator(organSlug, payload.mode, false, Date.now() - started, reason);
   return respond(payload);
 }

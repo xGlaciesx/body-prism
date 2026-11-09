@@ -259,7 +259,8 @@ export default function MethodPage() {
             意见不同时我们倾向于往低标。
           </li>
           <li>
-            三维视图尚未上线：当前用表格与影响链图进入，空间感弱于原计划。
+            三维只回答「在哪」：首页的三维人体是入口，不承载任何医学结论；
+            模型是公开解剖数据整理而来，不是我们建模，取舍与压缩都可能丢失细节。
           </li>
           <li>
             信息之镜只是类比：它能帮你建立直觉，但它不是模型，也不产生任何预测。
@@ -274,14 +275,21 @@ export default function MethodPage() {
         </h2>
         <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted">
           <li>
-            解剖数据：BodyParts3D, © The Database Center for Life Science,
-            licensed under CC Attribution 4.0 International。
+            三维解剖模型：基于 Z-Anatomy（CC BY-SA 4.0）整理，几何数据源自
+            BodyParts3D，© The Database Center for Life Science（DBCLS，CC BY
+            4.0）。本站的三维资产同样以 CC BY-SA 4.0 分发——我们没有从零建模，
+            只做了选取、合并与压缩。
           </li>
           <li>
-            站内文字与插图：本团队原创，或由 AIGC 辅助生成后人工修改；
-            AIGC 使用范围与生成记录见仓库 `ATTRIBUTION.md`。
+            站内文字与原创插图：CC BY-NC-SA 4.0。可以转载，需署名、不得商用、
+            以相同方式共享。
           </li>
-          <li>代码：MIT（仅适用于代码，不覆盖文字与图像内容）。</li>
+          <li>代码：MIT（仅适用于代码，不覆盖文字、插图与三维模型）。</li>
+          <li>
+            当前版本没有随仓库分发 AIGC 生成的图片；使用记录见仓库
+            `docs/aigc-log.md`。三类内容的许可互不覆盖，完整条文见
+            `ATTRIBUTION.md`。
+          </li>
           <li>未使用医图库、教材插图或论文配图。</li>
         </ul>
       </section>

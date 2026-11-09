@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllOrgans, getOrgan } from "@/lib/content";
 import { LensTabs } from "@/components/lens-tabs";
@@ -39,6 +40,14 @@ export default async function OrganPage({
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/90">
           {organ.summary}
+        </p>
+        <p className="mt-4 text-sm">
+          <Link
+            href={`/chain?organ=${organ.slug}`}
+            className="text-information hover:underline"
+          >
+            在影响链图上看它影响谁、又被谁影响 →
+          </Link>
         </p>
       </header>
 
