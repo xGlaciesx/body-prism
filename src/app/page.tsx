@@ -5,7 +5,7 @@ import { organs } from "@/content/organs";
 
 export const metadata: Metadata = {
   title: "人体棱镜 Body Prism",
-  description: "同一具身体，三种读法：结构之镜、关系之镜、信息之镜。",
+  description: "通用大模型告诉你「可能是什么」，我们说清「凭什么」。",
 };
 
 const lenses: Lens[] = [
