@@ -8,9 +8,8 @@
 
 ## 技术栈
 - Next.js App Router + TypeScript strict
-- Tailwind CSS + shadcn/ui
-- React Three Fiber + three.js（第二阶段才装）
-- Vercel AI SDK（第二阶段才装）
+- Tailwind CSS 4（设计 token 写在 `globals.css` 的 `@theme` 里，不引组件库）
+- @google/model-viewer（Web Component，按需加载，给首页三维用）
 - Zod
 - npm
 
@@ -23,12 +22,15 @@
 - 不读取、不打印 `.env.local` 或任何环境变量。
 
 ## 目录
-- src/app：页面与路由
-- src/components：组件
-- src/content/organs：器官内容（先本地 TS 文件）
+- src/app：页面与路由；`src/app/api/curator` 是唯一的模型调用入口
+- src/components：组件（含 `body-viewer.tsx` 三维组件）
+- src/content/organs：器官内容（人工审核的 TS 文件，AI 不生成医学事实）
+- src/content/impact-graph.ts：影响链图谱（节点、边、证据等级）
+- src/data/anatomy-hotspots.ts：三维热点的世界坐标（由模型网格实测得出，**不要改数值**）
 - src/lib：schema、内容读取、工具函数
-- public：图片、模型
-- docs：团队手册、日志、决策
+- src/types：自定义元素的类型声明
+- public/models、public/meshopt：三维模型与 meshopt 解码器（少一个模型就不显示）
+- docs：技术文档、视频脚本、答辩材料、部署、日志、决策
 
 ## 编码规则
 - 默认 Server Component；只有需要状态、事件、浏览器 API、3D 时才写 `"use client"`。
@@ -49,7 +51,9 @@
 - 不把假说写成共识；证据等级 A/B/C/D 要标清楚。
 
 ## Git
-- 不直接 push main；开分支 + PR。
+- **新功能、重构、涉及多个文件的改动**：开分支 + PR，走 CI。不是"不许碰 main"，是为了让你们把提 PR、看 diff、等 CI 这套流程真正练一遍。
+- **小修复、文档、配置**：可以直接提交到 `main`。流程是用来省事的，不是用来加仪式感的。
+- 无论走哪条路，合并前 `main` 必须是绿的（CI 四步全过）。
 - commit 类型：feat / fix / docs / content / art / test / chore。
 - 提交前跑 `npm run lint` 和 `npm run build`。
 - 不提交 `.env.local`、`node_modules`、`.next`、原始 OBJ/PSD/Procreate 文件。

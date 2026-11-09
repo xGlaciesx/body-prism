@@ -19,7 +19,7 @@ AI 取走的其实不是答案，是**追问的能力**。两个人对身体看�
 
 ## 在线演示
 
-（待部署，部署说明见 `docs/plan/submission/DEPLOY-ONLINE-DEMO.md`）
+（待部署，部署说明见 [`docs/DEPLOY.md`](docs/DEPLOY.md)）
 
 ## 技术栈与依赖清单
 
@@ -32,8 +32,11 @@ AI 取走的其实不是答案，是**追问的能力**。两个人对身体看�
 | ESLint | 9 | 代码检查 |
 | zod | 4 | 接口与内容的运行时校验 |
 | vitest | 4 | 纯函数与内容完整性测试 |
+| @google/model-viewer | 4.4.0 | 首页三维人体；用 Web Component 而不是自己搭一套 three.js 场景 |
 
-依赖刻意保持最少：没有三维引擎、没有 UI 组件库、没有状态管理库。`@google/model-viewer`（三维器官入口）**未引入**——三维视图本轮未上线，首页用一条真实的影响链代替占位。
+依赖刻意保持最少：没有 UI 组件库、没有状态管理库、没有额外的三维引擎（model-viewer 内部自带的 three.js 不算进我们的构建产物体积，它按需加载）。
+
+三维模型 `public/models/body.glb` 是 **meshopt 压缩**的，`model-viewer` 默认不解码。少一个文件就**不报错、只是空白**：`public/meshopt/meshopt_decoder.js`（meshoptimizer 0.24.0）必须存在，且版本不能升到 1.x（新版本只发 ESM，而 model-viewer 是用 `<script src>` 加载它的）。
 
 ## 本地运行
 
@@ -52,13 +55,15 @@ npm run dev
 
 ```text
 src/
-├─ app/              页面与路由（首页 / 探索 / 器官详情 / 关于 / 方法）
-├─ components/       展示组件（三镜卡片、证据徽章、来源列表等）
+├─ app/              页面与路由（首页 / 探索 / 器官详情 / 影响链 / 关于 / 方法）
+├─ components/       展示组件（三镜卡片、证据徽章、三维身体、来源列表等）
 ├─ content/organs/   器官内容数据（人工审核，AI 不生成医学事实）
+├─ data/             三维热点的世界坐标（由 body.glb 逐个网格实测得出）
 └─ lib/              纯逻辑：schema.ts（校验）、content.ts（读取）、curator-fallback.ts（兜底）
-docs/
-├─ plan/             唯一执行计划与任务卡
-└─ team-handbook/    团队手册（历史资料）
+public/
+├─ models/body.glb   合并后的三维模型（2.79 MB，11 个器官）
+└─ meshopt/          meshopt 解码器（少它模型不显示）
+docs/                技术文档、视频脚本、答辩材料、AIGC 记录
 ```
 
 ## AI 部分是怎么做的
@@ -91,6 +96,10 @@ A→D 不是一条「可靠程度」的梯子：A/B 是西医主线的证据强�
 
 ## 许可
 
-- 代码：MIT（见 `LICENSE`，仅适用于代码）
-- 站内文字与图像内容：版权归作者所有，不随代码授权
-- 第三方素材：遵循各自许可，见 `ATTRIBUTION.md`
+本站三类内容分开授权，互不覆盖，完整条文见 `ATTRIBUTION.md`：
+
+| 内容 | 许可 |
+|---|---|
+| 代码（`src/`） | MIT，见 `LICENSE` |
+| 站内文字与原创插图 | CC BY-NC-SA 4.0（署名—非商业—相同方式共享） |
+| 三维模型（`public/models/body.glb`） | CC BY-SA 4.0（基于 Z-Anatomy 整理，几何源自 BodyParts3D） |
