@@ -72,7 +72,7 @@ export const stomach: OrganContent = {
       id: "C-STOMACH-INFO-1",
       lens: "information",
       text: "把胃描述为“把大块输入拆成可处理信号的反应室”是概念类比。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-STOMACH-004"],
       caveat: "概念类比，不构成医学解释。",
     },

@@ -73,7 +73,7 @@ export const largeIntestine: OrganContent = {
       id: "C-LI-INFO-1",
       lens: "information",
       text: "把大肠描述为“排放前的最后一道浓缩与打包”是概念类比。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-LI-004"],
       caveat: "概念类比，不构成医学解释。",
     },

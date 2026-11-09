@@ -74,7 +74,7 @@ export const heart: OrganContent = {
       id: "C-HEART-INFO-1",
       lens: "information",
       text: "把心脏描述为“信息节点”是概念类比，用于组织叙事，不是医学诊断依据。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-HEART-003"],
       caveat: "概念类比，不等于生理机制。",
     },

@@ -15,14 +15,14 @@ const config: Record<
     tooltip: "综述、队列或仍在讨论的机制",
   },
   C: {
-    text: "C · 概念类比",
+    text: "C · 传统理论",
     className: "bg-relationship text-white",
-    tooltip: "概念类比，非医学结论",
+    tooltip: "传统理论的表述，非现代医学共识",
   },
   D: {
-    text: "D · 传统理论",
+    text: "D · 概念类比",
     className: "bg-muted text-white",
-    tooltip: "传统理论，非现代医学共识",
+    tooltip: "概念类比，用于组织叙事，不构成医学结论",
   },
 };
 

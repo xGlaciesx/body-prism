@@ -72,7 +72,7 @@ export const bladder: OrganContent = {
       id: "C-BLAD-INFO-1",
       lens: "information",
       text: "把膀胱描述为“带阈值的缓冲区”是概念类比。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-BLAD-004"],
       caveat: "概念类比，不构成医学解释。",
     },

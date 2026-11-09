@@ -73,7 +73,7 @@ export const spleen: OrganContent = {
       id: "C-SPLEEN-INFO-1",
       lens: "information",
       text: "把脾描述为“血液的质检与回收站”是概念类比。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-SPLEEN-005"],
       caveat: "概念类比，不构成医学解释。",
     },

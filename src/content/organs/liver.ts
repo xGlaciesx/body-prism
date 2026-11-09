@@ -71,7 +71,7 @@ export const liver: OrganContent = {
       id: "C-LIVER-INFO-1",
       lens: "information",
       text: "把肝描述为“缓冲器和过滤器”是工程类比，用来解释它稳定内环境的作用。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-LIVER-003"],
       caveat: "概念类比，不构成任何健康判断。",
     },

@@ -73,7 +73,7 @@ export const gallbladder: OrganContent = {
       id: "C-GB-INFO-1",
       lens: "information",
       text: "把胆囊描述为“带阈值的缓冲罐”是概念类比。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-GB-005"],
       caveat: "概念类比，不构成医学解释。",
     },

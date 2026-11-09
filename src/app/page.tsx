@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LensCard, type Lens } from "@/components/lens-card";
+import { EvidenceBadge } from "@/components/evidence-badge";
 import { organs } from "@/content/organs";
+import { impactEdges, impactNodes } from "@/content/impact-graph";
 
 export const metadata: Metadata = {
   title: "人体棱镜 Body Prism",
@@ -28,6 +30,10 @@ const lenses: Lens[] = [
     tone: "information",
   },
 ];
+
+/** 首屏右侧的样例：取一条真实存在的边，而不是编一个好看的例子。 */
+const sampleEdge = impactEdges.find((edge) => edge.id === "E-KID-BP");
+const nodeName = new Map(impactNodes.map((node) => [node.id, node.nameCn]));
 
 export default function Home() {
   return (
@@ -74,8 +80,53 @@ export default function Home() {
             </p>
           </div>
 
-          {/* 右侧留空：T14 的三维入口放这里，先占住 5 栏栅格避免返工。 */}
-          <div className="lg:col-span-5" aria-hidden="true" />
+          {/* T14 的三维器官入口尚未上线（计划内可砍项），这里先用一条真实的影响链占住 5 栏，
+              不为假的三维留空白。三维接上后替换本块即可。 */}
+          <div className="lg:col-span-5">
+            {sampleEdge ? (
+              <div className="rounded-2xl border border-line bg-paper-2 p-6">
+                <p className="text-sm font-medium tracking-widest text-muted">
+                  一条链长什么样
+                </p>
+
+                <p className="mt-4 font-serif text-xl font-semibold">
+                  {nodeName.get(sampleEdge.from)}
+                  <span aria-hidden className="mx-2 text-muted">
+                    →
+                  </span>
+                  {nodeName.get(sampleEdge.to)}
+                </p>
+
+                <p className="mt-3 text-sm leading-relaxed text-ink/90">
+                  {sampleEdge.mechanism}
+                </p>
+
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <EvidenceBadge level={sampleEdge.evidenceLevel} />
+                  <span className="font-mono text-xs text-muted">
+                    {sampleEdge.sourceIds.join(" · ")}
+                  </span>
+                </div>
+
+                <p className="mt-4 border-t border-line pt-4 text-xs leading-relaxed text-muted">
+                  {sampleEdge.caveat}
+                </p>
+
+                <p className="mt-4 text-sm">
+                  <Link
+                    href={`/chain?organ=${sampleEdge.from.replace("organ:", "")}`}
+                    className="text-information hover:underline"
+                  >
+                    在图上点开这条边 →
+                  </Link>
+                </p>
+              </div>
+            ) : null}
+
+            <p className="mt-3 text-xs leading-relaxed text-muted">
+              三维器官视图仍在开发中。当前用器官列表与影响链图进入，不假装有一个还没有的东西。
+            </p>
+          </div>
         </div>
       </section>
 

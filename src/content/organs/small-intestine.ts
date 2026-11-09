@@ -72,7 +72,7 @@ export const smallIntestine: OrganContent = {
       id: "C-SI-INFO-1",
       lens: "information",
       text: "把小肠描述为“主换热面”是概念类比。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-SI-004"],
       caveat: "概念类比，不构成医学解释。",
     },

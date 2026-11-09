@@ -73,7 +73,7 @@ export const brain: OrganContent = {
       id: "C-BRAIN-INFO-1",
       lens: "information",
       text: "把脑描述为“预测机器”是认知科学中的一种模型，属于概念类比，不是临床诊断工具。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-BRAIN-004"],
       caveat: "概念类比；同一现象存在多种理论解释。",
     },

@@ -72,7 +72,7 @@ export const lung: OrganContent = {
       id: "C-LUNG-INFO-1",
       lens: "information",
       text: "把气体交换描述为“沿分压梯度传递信号”是概念类比，用于解释扩散方向。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-LUNG-003"],
       caveat: "概念类比，不是生理机制的全部。",
     },

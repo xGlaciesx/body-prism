@@ -71,7 +71,7 @@ export const kidney: OrganContent = {
       id: "C-KIDNEY-INFO-1",
       lens: "information",
       text: "把肾描述为“先全量采样、再选择性保留”的系统，是工程类比。",
-      evidenceLevel: "C",
+      evidenceLevel: "D",
       sourceIds: ["SRC-KIDNEY-003"],
       caveat: "概念类比，不用于判断肾功能。",
     },
