@@ -7,14 +7,14 @@
 //
 // 用法：position 直接喂给 <model-viewer> 里 <a slot="hotspot-N" data-position="...">。
 // 前提：GLB 原样加载，**没有重新居中**。一旦你在 Blender 里把原点挪了，
-//       这些数全部作废，要重算（见 D17 §2.4.6）。
+//       这些数全部作废，要重算。
 //
-// 一条硬规矩（D17 §2.5.2）：**一个热点必须对应一篇能看的内容页。**
-// 11 个器官的内容都在 content-pack/organs/ 里了，所以 11 个点都能点。
+// 一条硬规矩：**一个热点必须对应一篇能看的内容页。**
+// 11 个器官的内容都在 src/content/organs/ 里了，所以 11 个点都能点。
 
 export type System = "visceral" | "cardiovascular" | "nervous" | "lymphoid";
 
-/** 五脏六腑里的六腑少一个三焦（没有对应的网格），见 D17 §2.5.5 */
+/** 五脏六腑里的六腑少一个三焦（没有对应的网格） */
 export type OrganSlug =
   | "heart"
   | "brain"
@@ -103,6 +103,11 @@ export const HOTSPOTS: Hotspot[] = [
 /** 需要单个器官时用（比如 /organ 页里做一个小定位图） */
 export function hotspotsFor(organ: OrganSlug): Hotspot[] {
   return HOTSPOTS.filter((h) => h.organ === organ);
+}
+
+/** 把内容层的 string slug 收窄成三维层认识的 OrganSlug；认不出来就返回 undefined。 */
+export function toOrganSlug(slug: string): OrganSlug | undefined {
+  return HOTSPOTS.find((h) => h.organ === slug)?.organ;
 }
 
 /** 按层级取：首页可以只显示核心 6 个，扩展 5 个留给"展开" */

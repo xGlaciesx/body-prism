@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { getAllOrgans, getOrgan } from "@/lib/content";
 import { LensTabs } from "@/components/lens-tabs";
 import { SourceList } from "@/components/source-list";
+import { BodyViewer } from "@/components/body-viewer";
+import { toOrganSlug } from "@/data/anatomy-hotspots";
 
 export function generateStaticParams() {
   return getAllOrgans().map((o) => ({ slug: o.slug }));
@@ -50,6 +52,15 @@ export default async function OrganPage({
           </Link>
         </p>
       </header>
+
+      {toOrganSlug(organ.slug) ? (
+        <section aria-labelledby="locator-heading" className="mt-8">
+          <h2 id="locator-heading" className="sr-only">
+            {organ.nameCn}在身体里的位置
+          </h2>
+          <BodyViewer variant="locator" organ={toOrganSlug(organ.slug)} />
+        </section>
+      ) : null}
 
       <LensTabs lenses={organ.lenses} claims={organ.claims} />
 
