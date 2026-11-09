@@ -38,6 +38,8 @@ AI 取走的其实不是答案，是**追问的能力**。两个人对身体看�
 
 三维模型 `public/models/body.glb` 是 **meshopt 压缩**的，`model-viewer` 默认不解码。少一个文件就**不报错、只是空白**：`public/meshopt/meshopt_decoder.js`（meshoptimizer 0.24.0）必须存在，且版本不能升到 1.x（新版本只发 ESM，而 model-viewer 是用 `<script src>` 加载它的）。
 
+首页的三维是完整版：11 个器官热点、按系统筛选（内脏/循环/神经/淋巴）、四个固定机位、11 个器官快选；每个器官页顶部还有一个只显示该器官位置的定位图。三维只回答"在哪"，不承载任何医学结论。
+
 ## 本地运行
 
 ```bash

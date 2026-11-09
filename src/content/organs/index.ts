@@ -12,11 +12,11 @@ import { stomach } from "./stomach";
 import type { OrganContent } from "@/lib/schema";
 
 /**
- * 11 个器官的入口（五脏六腑缺三焦，见 D17 §2.5.5）。
+ * 11 个器官的入口（五脏六腑缺三焦）。
  *
  * 前 6 个是核心（心、脑、肺、肝、肾、胃），后 5 个是后来扩的
  * （脾、胆、小肠、大肠、膀胱）。三维上 12 个热点全部对应到这里的某一页，
- * 一个热点一页，不允许有点进去 404 的器官（D17 §2.5.2）。
+ * 一个热点一页，不允许有点进去 404 的器官。
  *
  * 如果只想先上线一部分，把数组截短即可，其余 import 保留不会报错。
  */
@@ -38,7 +38,7 @@ export const organs: OrganContent[] = [
 
 export const organBySlug = new Map(organs.map((o) => [o.slug, o]));
 
-/** 三维热点里的 tier 和这里的划分要一致（D17 §2.5.7） */
+/** 三维热点里的 tier 和这里的划分要一致 */
 export const extendedSlugs = new Set([
   "spleen",
   "gallbladder",
