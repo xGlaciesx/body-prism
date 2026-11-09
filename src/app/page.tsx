@@ -51,9 +51,32 @@ export default function Home() {
                 Body Prism
               </span>
             </h1>
-            <p className="mt-6 text-xl leading-relaxed sm:text-2xl">
-              通用大模型告诉你「可能是什么」，我们说清「凭什么」。
-            </p>
+            {/* 这句是全站的定位语。拆成两行是为了不让它在窄屏上折在「我们说清」中间，
+                第二行用 structure 色标出侧重的那半句。 */}
+            <div className="mt-9 max-w-md">
+              <p className="text-sm leading-relaxed text-muted sm:text-base">
+                通用大模型告诉你「可能是什么」。
+              </p>
+              <p className="mt-2 font-serif text-2xl font-bold leading-snug text-ink sm:text-[1.75rem]">
+                我们说清<span className="text-structure">「凭什么」</span>。
+              </p>
+
+              <div className="mt-5">
+                <div className="flex gap-1" aria-hidden>
+                  <span className="h-1 flex-1 rounded-full bg-structure" />
+                  <span className="h-1 flex-1 rounded-full bg-relationship" />
+                  <span className="h-1 flex-1 rounded-full bg-information" />
+                </div>
+                <div className="mt-1.5 flex justify-between text-[11px] text-muted">
+                  <span>结构</span>
+                  <span>关系</span>
+                  <span>信息</span>
+                </div>
+                <p className="sr-only">
+                  本站的三种读法：结构之镜、关系之镜、信息之镜，分别对应三种颜色。
+                </p>
+              </div>
+            </div>
 
             <ol className="mt-8 list-decimal space-y-3 pl-5 text-base leading-relaxed text-ink/90">
               <li>身体不舒服时，越来越多人不再搜索，而是直接问 AI。</li>
