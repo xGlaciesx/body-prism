@@ -1,16 +1,14 @@
 # docs 目录索引
 
-> 2026-11-09 整理过一轮：开工期的脚手架（`plan/`、`team-handbook/`、`PLAN-DAILY.md`，共 80 个文件）
-> 已从仓库移除，只留下**能被评委直接看到、能对上网站实际功能**的材料。
-> 被移除的内容里，只有部署指南有长期价值，已重写为 [`DEPLOY.md`](./DEPLOY.md)。
+> 2026-11-09 清理过开工期资料。Git 历史仍可能包含被移除的文件；此目录同时包含正式材料草稿、工作稿和历史记录，并非全部已经完成事实核验。提交前应核对实际功能、来源、人员贡献及比赛规则。
 
 ## 提交材料
 
 | 文件 | 是什么 | 谁用 |
 |---|---|---|
-| [`TECH-DOC.md`](./TECH-DOC.md) | 技术文档正文，导出 PDF 提交（≤30 页） | 评审 / 答辩 |
+| [`TECH-DOC.md`](./TECH-DOC.md) | 技术文档草稿；省赛 PDF 不超过 30 页，提交前核对最新通知 | 评审 |
 | [`DEMO-VIDEO-SCRIPT.md`](./DEMO-VIDEO-SCRIPT.md) | 演示视频分镜与台词（6:30，1080p） | 录制 |
-| [`NARRATIVE-AND-QA.md`](./NARRATIVE-AND-QA.md) | 叙事升级方案 + 评委问答 20 问 | 答辩人 |
+| [`NARRATIVE-AND-QA.md`](./NARRATIVE-AND-QA.md) | 叙事与常见问题工作稿，不是省赛必交材料 | 团队自查 |
 | [`SUBMISSION-CHECKLIST.md`](./SUBMISSION-CHECKLIST.md) | 提交前逐项核对 | 两人 |
 | [`DEPLOY.md`](./DEPLOY.md) | 在线演示部署、评审期保障、上线前检查表 | 部署 |
 
@@ -18,7 +16,7 @@
 
 | 文件 | 是什么 |
 |---|---|
-| [`medical-review-impact-graph.md`](./medical-review-impact-graph.md) | 56 条影响链边的逐条医学审核记录 |
+| [`medical-review-impact-graph.md`](./medical-review-impact-graph.md) | 影响链内容的审阅工作记录；审核人、范围和结论须核实 |
 | [`medical-disclaimer.md`](./medical-disclaimer.md) | 免责声明口径 |
 | [`aigc-log.md`](./aigc-log.md) | AIGC 使用记录（当前版本未随仓库分发 AIGC 图片） |
 | [`../ATTRIBUTION.md`](../ATTRIBUTION.md) | 三类内容的许可与三维资产的完整署名 |
@@ -30,5 +28,4 @@
 | [`DECISIONS.md`](./DECISIONS.md) | 已拍板的决策，含每条的原因与日期 |
 | [`SESSION_LOG.md`](./SESSION_LOG.md) | 开发日志，按天记录做了什么、卡在哪 |
 
-> 比赛要求「保留细粒度的 Git 提交历史」，真正的证据在 `git log` 里；
-> 这两份文件只是给人看的索引，不替代提交历史，也不和后者的内容冲突。
+> 过程记录和 Git 历史可以辅助追溯，但不能单独证明实际贡献和审核情况；比赛具体材料要求以官方规则为准。
